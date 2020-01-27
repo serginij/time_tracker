@@ -28,5 +28,5 @@
 
   "options_page": "dist/index.html",
 
-  "permissions": ["activeTab", "storage"]
+  "permissions": ["background", "activeTab", "storage", "tabs", "runtime"]
 }
