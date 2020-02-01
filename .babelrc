@@ -1,0 +1,20 @@
+{
+  "env": {
+    "test": {
+      "plugins": ["@babel/plugin-transform-modules-commonjs"]
+    }
+  },
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "useBuiltIns": "usage",
+        "loose": true,
+        "modules": false
+      }
+    ],
+    "@babel/preset-react",
+    "linaria/babel"
+  ],
+  "plugins": ["@babel/plugin-syntax-dynamic-import"]
+}
