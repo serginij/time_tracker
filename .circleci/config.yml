@@ -6,12 +6,6 @@ jobs:
 
     working_directory: ~/repo
 
-general:
-  branches:
-    only:
-      - master
-      - dev
-
 steps:
   - checkout
 
