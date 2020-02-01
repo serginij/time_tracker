@@ -5,10 +5,13 @@ jobs:
       - image: circleci/node:12.9.1-browsers
 
     working_directory: ~/repo
-    branches:
-      only:
-        - master
-        - dev
+
+general:
+  branches:
+    only:
+      - master
+      - dev
+
 steps:
   - checkout
 
