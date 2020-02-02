@@ -1,12 +1,11 @@
 import React from 'react'
 import { styled } from 'linaria/react'
 
-export const Main = () => {
+export const Main = ({ sites }) => {
   // const sites = JSON.parse(
   //   '[{"tabId":3906,"url":"chrome-extension://fifpkgdkjiobjdjhbofplaffockmgbba/dist/index.html","time":69},{"tabId":3894,"url":"chrome://extensions/?id=fifpkgdkjiobjdjhbofplaffockmgbba","time":12}]'
   // )
 
-  let sites = JSON.parse(localStorage.getItem('sites')) || []
   // sites.push({ tabId: 2345, url: 'https://some-site.com', time: 900 })
 
   let list = sites.map(item => {
@@ -42,7 +41,7 @@ export const Main = () => {
   return (
     <div>
       <SubTitle>Time spent on websites</SubTitle>
-      <List>{list}</List>
+      <List data-testid="list">{list}</List>
     </div>
   )
 }

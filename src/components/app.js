@@ -6,7 +6,7 @@ import { Main } from './main'
 export const App = () => (
   <div>
     <Title>Time tracker options</Title>
-    <Main />
+    <Main sites={JSON.parse(localStorage.getItem('sites')) || []} />
   </div>
 )
 
