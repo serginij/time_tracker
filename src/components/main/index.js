@@ -1,13 +1,7 @@
 import React from 'react'
 import { styled } from 'linaria/react'
 
-export const Main = ({ sites }) => {
-  // const sites = JSON.parse(
-  //   '[{"tabId":3906,"url":"chrome-extension://fifpkgdkjiobjdjhbofplaffockmgbba/dist/index.html","time":69},{"tabId":3894,"url":"chrome://extensions/?id=fifpkgdkjiobjdjhbofplaffockmgbba","time":12}]'
-  // )
-
-  // sites.push({ tabId: 2345, url: 'https://some-site.com', time: 900 })
-
+export const Main = ({ sites = [] }) => {
   let list = sites.map(item => {
     let sec = item.time
     let min, hrs
