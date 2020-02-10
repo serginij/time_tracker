@@ -1,14 +1,16 @@
 import React from 'react'
 import { styled } from 'linaria/react'
 
-export const SiteElement = ({ favicon, url, time, onDelete }) => {
+export const SiteElement = ({ favicon, url, time, onDelete, disabled }) => {
   return (
     <>
       <Img src={favicon} alt={favicon + ' logo'} />
       <Name>{url}</Name>
       <Time>
         {Math.round(time / 60, 1) + ' min'}
-        <CloseButton onClick={onDelete}>{'×'}</CloseButton>
+        <CloseButton disabled={disabled} onClick={onDelete}>
+          {'×'}
+        </CloseButton>
       </Time>
     </>
   )
@@ -20,10 +22,6 @@ const Img = styled.img`
   border-radius: 50%;
   border: 1px solid gray;
   cursor: pointer;
-
-  &:hover {
-    opacity: 0.7;
-  }
 `
 
 const Name = styled.p`

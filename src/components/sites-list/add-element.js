@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { styled } from 'linaria/react'
 
-export const AddElement = ({ onClick }) => {
+export const AddElement = ({ onClick, disabled }) => {
   let [edit, setEdit] = useState(false)
   let [text, setText] = useState('')
   let [data, setData] = useState({})
@@ -21,7 +21,9 @@ export const AddElement = ({ onClick }) => {
 
   return (
     <>
-      <Button onClick={handleOpen}>+</Button>
+      <Button disabled={disabled} onClick={handleOpen}>
+        +
+      </Button>
       {edit && (
         <Popup width={data.width} left={data.x} top={data.y}>
           <Header>
@@ -51,6 +53,10 @@ const Button = styled.button`
   font-size: 32px;
   padding-bottom: 6px;
   cursor: pointer;
+
+  &:focus {
+    outline: none;
+  }
 `
 
 const Popup = styled.div`
@@ -106,6 +112,10 @@ const CloseButton = styled.button`
   color: black;
   margin-bottom: 2px
   visibility: ${props => (props.hidden ? 'hidden' : 'visible')};
+
+  &:focus {
+    outline: none;
+  }
 `
 
 const Header = styled.header`

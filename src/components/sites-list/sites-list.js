@@ -3,16 +3,12 @@ import { styled } from 'linaria/react'
 
 import { SiteElement } from './site-element'
 import { AddElement } from './add-element'
+import { Switch } from './switch'
 
-export const SitesList = () => {
-  let [sites, setSites] = useState([
-    {
-      url: 'habr.com',
-      favicon:
-        'https://sun9-13.userapi.com/c857024/v857024708/197d7/xr27umrtkvo.jpg?ava=1',
-      time: 100
-    }
-  ])
+export const SitesList = ({ onModeChange }) => {
+  let [sites, setSites] = useState([])
+
+  const [checked, setChecked] = useState(false)
 
   const handleAddSite = url => {
     let newSites = [...sites]
@@ -21,24 +17,39 @@ export const SitesList = () => {
       newUrl.slice(2, 3)
     }
     newUrl.join('')
-    newSites.push({
-      url: url,
-      favicon:
-        'https://sun9-13.userapi.com/c857024/v857024708/197d7/xr27umrtkvo.jpg?ava=1',
-      time: 0
-    })
-    localStorage.setItem('sites', JSON.stringify(newSites))
+    if (sites.filter(item => item.url === url).length == 0) {
+      newSites.push({
+        url: url,
+        favicon: 'https://' + url + '/favicon.ico',
+        time: 0
+      })
+    }
+    localStorage.setItem('customSites', JSON.stringify(newSites))
     setSites(newSites)
   }
 
   const handleDeleteSite = url => {
     let newSites = sites.filter(site => site.url !== url)
-    localStorage.setItem('sites', JSON.stringify(newSites))
+    localStorage.setItem('customSites', JSON.stringify(newSites))
     setSites(newSites)
   }
 
+  const handleCheck = e => {
+    if (e.target.checked) {
+      localStorage.setItem('allSites', localStorage.getItem('sites'))
+      localStorage.setItem('sites', localStorage.getItem('customSites'))
+    } else {
+      localStorage.setItem('customSites', localStorage.getItem('sites'))
+      localStorage.setItem('sites', localStorage.getItem('allSites'))
+    }
+    localStorage.setItem('useCustomSites', e.target.checked)
+    setChecked(e.target.checked)
+    onModeChange(e.target.checked)
+  }
+
   useEffect(() => {
-    setSites(JSON.parse(localStorage.getItem('sites')) || [])
+    setSites(JSON.parse(localStorage.getItem('customSites')))
+    setChecked(JSON.parse(localStorage.getItem('useCustomSites')))
   }, [])
 
   let list = sites.map(site => (
@@ -48,16 +59,18 @@ export const SitesList = () => {
         url={site.url}
         favicon={site.favicon}
         time={site.time}
+        disabled={!checked}
       />
     </Item>
   ))
   return (
     <Wrapper>
       <SubTitle>Which sites to be tracked ?</SubTitle>
-      <List>
+      <Switch onClick={handleCheck} checked={checked} />
+      <List checked={checked}>
         {list}
         <Item>
-          <AddElement onClick={handleAddSite} />
+          <AddElement disabled={!checked} onClick={handleAddSite} />
         </Item>
       </List>
     </Wrapper>
@@ -74,6 +87,7 @@ const List = styled.ul`
   list-style: none;
   padding: 0;
   display: flex;
+  opacity: ${props => (props.checked ? '1' : '0.5')};
 `
 
 const Item = styled.li`
