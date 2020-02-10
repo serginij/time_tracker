@@ -56,7 +56,7 @@ module.exports = {
     new CleanWebpackPlugin(),
     new HtmlWebPackPlugin({
       template: './public/index.html',
-      title: 'Time tracker'
+      title: 'Limer'
     }),
     new MiniCssExtractPlugin({
       filename: 'styles.css'
