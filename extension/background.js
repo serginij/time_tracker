@@ -17,6 +17,9 @@ chrome.runtime.onInstalled.addListener(function(details) {
   if (details.reason == 'install') {
     localStorage.setItem('sites', JSON.stringify([]))
     localStorage.setItem('time', 0 + '')
+    localStorage.setItem('allSites', JSON.stringify([]))
+    localStorage.setItem('customSites', JSON.stringify([]))
+    localStorage.setItem('useCustomSites', false)
     if (chrome.runtime.openOptionsPage) {
       chrome.runtime.openOptionsPage()
       // clearInterval(timer);
@@ -37,6 +40,7 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
       .slice(2, 3)
       .join('/')
 
+    let useCustomSites = JSON.parse(localStorage.getItem('useCustomSites'))
     let prev = JSON.parse(localStorage.getItem('current'))
     if (!prev) {
       prev = { tabId: 0, url: '', time: 0 }
@@ -46,10 +50,12 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
     localStorage.setItem('time', 0 + '')
 
     time = 0
+    let flag = 0
     sites = JSON.parse(localStorage.getItem('sites')) || []
     sites = sites.filter(site => {
       if (site.url === prev.url) {
         prev.time += site.time
+        flag = 1
       }
       if (activeInfo.url === prev.url) {
         current = { ...prev }
@@ -58,17 +64,32 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
       }
       return site.url !== prev.url
     })
+
     if (prev.url !== '') {
       console.log('sites', sites)
       let extension
       chrome.runtime.getBackgroundPage(backPage => {
         extension = backPage.document.domain
-      })
 
-      if (prev.url !== extension) {
-        sites.push(prev)
-        localStorage.setItem('sites', JSON.stringify(sites))
-      }
+        console.log('prev url', prev.url)
+        console.log('extention', extension)
+
+        if (prev.url !== extension) {
+          if (!prev.favicon) {
+            prev.favicon = 'https://' + prev.url + '/favicon.ico' || ''
+          }
+          console.log('useCustomSites', useCustomSites)
+          if (useCustomSites) {
+            if (flag) {
+              sites.push(prev)
+              localStorage.setItem('sites', JSON.stringify(sites))
+            }
+          } else {
+            sites.push(prev)
+            localStorage.setItem('sites', JSON.stringify(sites))
+          }
+        }
+      })
     }
 
     current.url = activeInfo.url
@@ -100,7 +121,8 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         .split('/')
         .slice(2, 3)
         .join('/'),
-      time: 0
+      time: 0,
+      favicon: tab.favIconUrl
     }
     // let flag = 0
     sites.forEach(site => {
@@ -109,6 +131,8 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         // flag = 1
       }
     })
+
+    console.log('reloaded', tab)
 
     localStorage.setItem('current', JSON.stringify(current))
     current = {
