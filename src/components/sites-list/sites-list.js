@@ -5,7 +5,7 @@ import { SiteElement } from './site-element'
 import { AddElement } from './add-element'
 import { Switch } from './switch'
 
-export const SitesList = ({ onModeChange }) => {
+export const SitesList = ({ onModeChange, disabled }) => {
   let [sites, setSites] = useState([])
 
   const [checked, setChecked] = useState(false)
@@ -35,13 +35,6 @@ export const SitesList = ({ onModeChange }) => {
   }
 
   const handleCheck = e => {
-    if (e.target.checked) {
-      localStorage.setItem('allSites', localStorage.getItem('sites'))
-      localStorage.setItem('sites', localStorage.getItem('customSites'))
-    } else {
-      localStorage.setItem('customSites', localStorage.getItem('sites'))
-      localStorage.setItem('sites', localStorage.getItem('allSites'))
-    }
     localStorage.setItem('useCustomSites', e.target.checked)
     setChecked(e.target.checked)
     onModeChange(e.target.checked)
@@ -59,18 +52,18 @@ export const SitesList = ({ onModeChange }) => {
         url={site.url}
         favicon={site.favicon}
         time={site.time}
-        disabled={!checked}
+        disabled={!checked || disabled}
       />
     </Item>
   ))
   return (
     <Wrapper>
-      <SubTitle>Which sites to be tracked ?</SubTitle>
-      <Switch onClick={handleCheck} checked={checked} />
+      <SubTitle>Use custom sites list ?</SubTitle>
+      <Switch onClick={handleCheck} checked={checked} disabled={disabled} />
       <List checked={checked}>
         {list}
         <Item>
-          <AddElement disabled={!checked} onClick={handleAddSite} />
+          <AddElement disabled={!checked || disabled} onClick={handleAddSite} />
         </Item>
       </List>
     </Wrapper>
