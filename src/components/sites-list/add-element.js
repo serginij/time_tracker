@@ -52,7 +52,7 @@ const Button = styled.button`
   border-radius: 50px;
   font-size: 32px;
   padding-bottom: 6px;
-  cursor: pointer;
+  cursor: ${props => (props.disabled ? 'initial' : 'pointer')};
 
   &:focus {
     outline: none;

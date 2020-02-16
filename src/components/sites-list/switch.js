@@ -1,11 +1,20 @@
 import React from 'react'
 import { styled } from 'linaria/react'
 
-export const Switch = ({ onClick, checked }) => {
+export const Switch = ({
+  onClick,
+  checked = false,
+  color = '2196f3',
+  disabledColor = 'cccccc',
+  disabled = false
+}) => {
+  const handleChange = e => {
+    !disabled && onClick(e)
+  }
   return (
-    <Label>
-      <Checkbox type="checkbox" checked={checked} onChange={onClick} />
-      <Slider className="slider" />
+    <Label disabled={disabled} color={color}>
+      <Checkbox type="checkbox" checked={checked} onChange={handleChange} />
+      <Slider className="slider" color={disabledColor} />
     </Label>
   )
 }
@@ -15,6 +24,7 @@ const Label = styled.label`
   display: inline-block;
   width: 40px;
   height: 22px;
+  cursor: ${props => (props.disabled ? 'initial' : 'pointer')};
 
   input {
     opacity: 0;
@@ -22,7 +32,7 @@ const Label = styled.label`
     height: 0;
 
     &:checked + .slider {
-      background-color: #2196f3;
+      background-color: ${props => '#' + props.color};
     }
 
     &:focus + .slider {
@@ -41,12 +51,12 @@ const Checkbox = styled.input``
 
 const Slider = styled.span`
   position: absolute;
-  cursor: pointer;
+  /* cursor: pointer; */
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ccc;
+  background-color: ${props => '#' + props.color};
   -webkit-transition: 0.4s;
   transition: 0.4s;
   border-radius: 11px;
