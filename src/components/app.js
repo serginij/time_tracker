@@ -4,6 +4,7 @@ import { styled } from 'linaria/react'
 import { Main } from './main'
 import { SitesList } from './sites-list/sites-list'
 import { TurnOff } from './turn-off/'
+import { Stats } from './stats/stats'
 
 export const App = () => {
   const [mode, setMode] = useState(
@@ -15,6 +16,10 @@ export const App = () => {
     ? localStorage.getItem('customSites')
     : localStorage.getItem('allSites')
 
+  let stats = mode
+    ? localStorage.getItem('customStats')
+    : localStorage.getItem('allStats')
+
   let onModeChange = mode => {
     setMode(mode)
   }
@@ -25,6 +30,10 @@ export const App = () => {
       <Body on={isOn}>
         <SitesList onModeChange={onModeChange} disabled={!isOn} />
         <Main sites={JSON.parse(sites) || []} />
+        <Stats
+        // stats={JSON.parse(stats) || []}
+        // sites={JSON.parse(sites) || []}
+        />
       </Body>
     </div>
   )
@@ -36,5 +45,6 @@ const Title = styled.h1`
 
 const Body = styled.div`
   opacity: ${props => (props.on ? '1' : '0.5')};
+  margin: 0 3%;
   cursor: initial;
 `

@@ -57,7 +57,7 @@ export const SitesList = ({ onModeChange, disabled }) => {
     </Item>
   ))
   return (
-    <Wrapper>
+    <>
       <SubTitle>Use custom sites list ?</SubTitle>
       <Switch onClick={handleCheck} checked={checked} disabled={disabled} />
       <List checked={checked}>
@@ -66,13 +66,9 @@ export const SitesList = ({ onModeChange, disabled }) => {
           <AddElement disabled={!checked || disabled} onClick={handleAddSite} />
         </Item>
       </List>
-    </Wrapper>
+    </>
   )
 }
-
-const Wrapper = styled.div`
-  margin: 0 3%;
-`
 
 const SubTitle = styled.h2``
 
