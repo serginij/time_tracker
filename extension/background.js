@@ -19,6 +19,8 @@ chrome.runtime.onInstalled.addListener(function(details) {
     localStorage.setItem('time', 0 + '')
     localStorage.setItem('allSites', JSON.stringify([]))
     localStorage.setItem('customSites', JSON.stringify([]))
+    localStorage.setItem('customStats', JSON.stringify({}))
+    localStorage.setItem('allStats', JSON.stringify({}))
     localStorage.setItem('useCustomSites', false)
     localStorage.setItem('isOn', true)
     if (chrome.runtime.openOptionsPage) {
@@ -51,7 +53,7 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
     let useCustomSites = JSON.parse(localStorage.getItem('useCustomSites'))
     let prev = JSON.parse(localStorage.getItem('current'))
     if (!prev) {
-      prev = { tabId: 0, url: '', time: 0 }
+      prev = { url: '', time: 0 }
     }
 
     prev.time = parseInt(localStorage.getItem('time'))
@@ -86,6 +88,7 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
         if (prev.url === extension) {
           const isOn = JSON.parse(localStorage.getItem('isOn'))
           if (isOn) {
+            clearInterval(timer)
             timer = setInterval(() => {
               chrome.tabs.query({ currentWindow: true }, arr => {
                 if (arr.length) {
@@ -115,18 +118,42 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
           console.log('useCustomSites', useCustomSites)
           if (useCustomSites) {
             if (flag) {
-              sites.push(prev)
-              localStorage.setItem('customSites', JSON.stringify(sites))
+              if (prev.date !== new Date().toLocaleDateString()) {
+                console.log('overdue')
+                let stats = JSON.parse(localStorage.getItem('customStats'))
+
+                stats[prev.date] = stats[prev.date]
+                  ? [...stats[prev.date], prev]
+                  : [prev]
+
+                localStorage.setItem('customStats', JSON.stringify(stats))
+              } else {
+                sites.push(prev)
+                localStorage.setItem('customSites', JSON.stringify(sites))
+              }
             }
           } else {
-            sites.push(prev)
-            localStorage.setItem('allSites', JSON.stringify(sites))
+            if (prev.date !== new Date().toLocaleDateString()) {
+              console.log('overdue')
+              let stats = JSON.parse(localStorage.getItem('allStats'))
+
+              stats[prev.date] = stats[prev.date]
+                ? [...stats[prev.date], prev]
+                : [prev]
+
+              localStorage.setItem('allStats', JSON.stringify(stats))
+            } else {
+              sites.push(prev)
+              localStorage.setItem('allSites', JSON.stringify(sites))
+            }
           }
         }
       })
     }
 
     current.url = activeInfo.url
+
+    current.date = new Date().toLocaleDateString()
     localStorage.setItem('current', JSON.stringify(current))
     console.log('prev tab', prev)
     console.log('current tab', current)
@@ -150,13 +177,13 @@ let getCurrentUrl = async () => {
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status == 'complete') {
     current = {
-      tabId: tabId,
       url: tab.url
         .split('/')
         .slice(2, 3)
         .join('/'),
       time: 0,
-      favicon: tab.favIconUrl
+      favicon: tab.favIconUrl,
+      date: new Date().toLocaleDateString()
     }
     // let flag = 0
     sites.forEach(site => {
@@ -169,14 +196,14 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     // console.log('reloaded', tab)
 
     localStorage.setItem('current', JSON.stringify(current))
-    current = {
-      tabId: tabId,
-      url: tab.url
-        .split('/')
-        .slice(2, 3)
-        .join('/'),
-      time: 0
-    }
+    // current = {
+    //   tabId: tabId,
+    //   url: tab.url
+    //     .split('/')
+    //     .slice(2, 3)
+    //     .join('/'),
+    //   time: 0
+    // }
   }
 })
 

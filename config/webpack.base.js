@@ -43,12 +43,19 @@ module.exports = {
             }
           }
         ]
+      },
+      {
+        test: /\.(gif|svg|jpg|png)$/,
+        use: {
+          loader: 'url-loader'
+        }
       }
     ]
   },
   resolve: {
     alias: {
-      '@components': path.resolve(__dirname, '../src/components/')
+      '@components': path.resolve(__dirname, '../src/components/'),
+      '@assets': path.resolve(__dirname, '../src/assets/')
     },
     extensions: ['.js']
   },
