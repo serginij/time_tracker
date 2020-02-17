@@ -25,6 +25,7 @@ export const Stats = ({ stats = {}, sites = [] }) => {
   }
 
   const todayTime = getTime(sites)
+  console.log(sites, todayTime)
 
   const storeToday = (index, array, date) => {
     if (index === today.getDay() && date === today.toLocaleDateString()) {
