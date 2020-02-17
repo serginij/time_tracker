@@ -31,8 +31,8 @@ export const App = () => {
         <SitesList onModeChange={onModeChange} disabled={!isOn} />
         <Main sites={JSON.parse(sites) || []} />
         <Stats
-        // stats={JSON.parse(stats) || []}
-        // sites={JSON.parse(sites) || []}
+          stats={JSON.parse(stats) || {}}
+          sites={JSON.parse(sites) || []}
         />
       </Body>
     </div>

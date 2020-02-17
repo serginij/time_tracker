@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { styled } from 'linaria/react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'
 
@@ -7,127 +7,168 @@ import { formatTime } from '../main/format-time'
 import left from '@assets/chevron-left.png'
 import right from '@assets/chevron-right.png'
 
-const today = [
-  {
-    url: 'github.com',
-    time: 23,
-    favicon: 'https://github.com/favicon.ico',
-    date: '17/02/2020'
-  },
-  {
-    url: 'music.yandex.ru',
-    time: 14,
-    favicon: 'https://music.yandex.ru/favicon.ico',
-    date: '17/02/2020'
-  },
-  {
-    url: 'extensions',
-    time: 31,
-    favicon: 'https://extensions/favicon.ico',
-    date: '17/02/2020'
-  },
-  {
-    url: 'trello.com',
-    time: 1196,
-    favicon: 'https://trello.com/favicon.ico',
-    date: '17/02/2020'
-  },
-  {
-    url: 'www.google.com',
-    time: 128,
-    date: '17/02/2020',
-    favicon: 'https://www.google.com/favicon.ico'
-  },
-  {
-    url: 'localhost:8000',
-    time: 59,
-    date: '17/02/2020',
-    favicon: 'https://localhost:8000/favicon.ico'
-  },
-  {
-    url: 'recharts.org',
-    time: 9368,
-    date: '17/02/2020',
-    favicon: 'https://recharts.org/favicon.ico'
-  },
-  {
-    url: 'jsfiddle.net',
-    time: 4903,
-    favicon: 'https://jsfiddle.net/img/favicon.png',
-    date: '17/02/2020'
-  }
-]
-
-const lastWeek = {
-  '16/02/2020': [
-    {
-      tabId: 814,
-      url: 'medium.com',
-      time: 567,
-      favicon: 'https://medium.com/favicon.ico',
-      date: '16/02/2020'
-    }
-  ]
-}
-
-export const Stats = ({ stats = lastWeek, sites = today }) => {
-  const data = []
+export const Stats = ({ stats = {}, sites = [] }) => {
   let today = new Date()
+  const [firstDay, setFirst] = useState(
+    new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() - today.getDay()
+    )
+  )
+
+  const getTime = array => {
+    return array.reduce((acc, site) => {
+      let siteTime = formatTime(site.time)
+      return acc + siteTime.hrs + siteTime.min / 60
+    }, 0)
+  }
+
+  const todayTime = getTime(sites)
+
+  const storeToday = (index, array, date) => {
+    if (index === today.getDay() && date === today.toLocaleDateString()) {
+      array[index] = {
+        date: today.toLocaleDateString(),
+        time: todayTime
+      }
+    }
+  }
+
+  let newData = []
 
   for (let i = 6; i >= 0; i--) {
+    let date = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() + i - today.getDay()
+    ).toLocaleDateString()
+
     if (i > today.getDay()) {
+      newData[i] = { date: date, time: 0 }
+    }
+
+    storeToday(i, newData, date)
+    if (i < today.getDay()) {
+      if (stats[date]) {
+        newData[i] = {
+          date: date,
+          time: getTime(stats[date])
+        }
+      } else {
+        newData[i] = { date: date, time: 0 }
+      }
+    }
+  }
+  const [data, setData] = useState(newData)
+
+  const goToday = () => {
+    let data = []
+
+    for (let i = 6; i >= 0; i--) {
       let date = new Date(
         today.getFullYear(),
         today.getMonth(),
         today.getDate() + i - today.getDay()
       ).toLocaleDateString()
-      data[i] = { date: date, time: 0 }
-    }
-    if (i == today.getDay()) {
-      data[i] = {
-        date: today.toLocaleDateString(),
-        time: sites.reduce((acc, site) => {
-          let siteTime = formatTime(site.time)
-          return acc + siteTime.hrs + siteTime.min / 60
-        }, 0)
+
+      if (i > today.getDay()) {
+        data[i] = { date: date, time: 0 }
+      }
+
+      storeToday(i, data, date)
+      if (i < today.getDay()) {
+        if (stats[date]) {
+          data[i] = {
+            date: date,
+            time: getTime(stats[date])
+          }
+        } else {
+          data[i] = { date: date, time: 0 }
+        }
       }
     }
-    if (i < today.getDay()) {
-      let date = new Date(
+
+    setData(data)
+    setFirst(
+      new Date(
         today.getFullYear(),
         today.getMonth(),
-        today.getDate() + i - today.getDay()
+        today.getDate() - today.getDay()
+      )
+    )
+  }
+
+  const showPrev = () => {
+    let data = []
+    let first = new Date(
+      firstDay.getFullYear(),
+      firstDay.getMonth(),
+      firstDay.getDate() - 7
+    )
+
+    for (let i = 0; i <= 6; i++) {
+      let date = new Date(
+        first.getFullYear(),
+        first.getMonth(),
+        first.getDate() + i
       ).toLocaleDateString()
 
       if (stats[date]) {
         data[i] = {
           date: date,
-          time: stats[date].reduce((acc, site) => {
-            let siteTime = formatTime(site.time)
-            return acc + siteTime.hrs + siteTime.min / 60
-          }, 0)
+          time: getTime(stats[date])
         }
       } else {
-        let date = new Date(
-          today.getFullYear(),
-          today.getMonth(),
-          today.getDate() + i - today.getDay()
-        ).toLocaleDateString()
         data[i] = { date: date, time: 0 }
       }
+      storeToday(i, data, date)
     }
+    setData(data)
+    setFirst(first)
   }
 
-  const showPrev = () => {}
+  const showNext = () => {
+    let data = []
+    let first = new Date(
+      firstDay.getFullYear(),
+      firstDay.getMonth(),
+      firstDay.getDate() + 7
+    )
 
-  const showNext = () => {}
+    for (let i = 0; i <= 6; i++) {
+      let date = new Date(
+        first.getFullYear(),
+        first.getMonth(),
+        first.getDate() + i
+      ).toLocaleDateString()
+
+      if (stats[date]) {
+        data[i] = {
+          date: date,
+          time: getTime(stats[date])
+        }
+      } else {
+        data[i] = { date: date, time: 0 }
+      }
+      storeToday(i, data, date)
+    }
+    setData(data)
+    setFirst(first)
+  }
 
   return (
     <Wrapper>
       <SubTitle>
-        <img src={left} alt="prev week" />
-        Statistics for last week <img src={right} alt="next week" />
+        <NavButton onClick={showPrev}>
+          <img src={left} alt="prev week" />
+        </NavButton>
+        Statistics for week
+        <NavButton onClick={showNext}>
+          <img src={right} alt="next week" />
+        </NavButton>
       </SubTitle>
+      <Button onClick={goToday}>today</Button>
       <BarChart
         width={800}
         height={400}
@@ -166,4 +207,23 @@ const SubTitle = styled.h2`
     height: 30px;
     cursor: pointer;
   }
+`
+
+const NavButton = styled.button`
+  background-color: none;
+  border: none;
+`
+
+const Button = styled.button`
+  width: 100px;
+  height: 2em;
+  font-size: 14px;
+  border-radius: 8px;
+  background-color: #2196f3;
+  color: white;
+  &:focus {
+    outline: 1px solid #2196f3;
+  }
+
+  cursor: pointer;
 `
