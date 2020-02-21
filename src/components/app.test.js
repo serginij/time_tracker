@@ -13,7 +13,7 @@ const renderApp = () => {
 
 describe('Sample test', () => {
   test('render app without crashes', () => {
-    const text = 'Time tracker options'
+    const text = 'Limer options'
     const { getByText } = renderApp()
     const container = getByText(text)
 

@@ -1,98 +1,216 @@
-let time = 0;
-let sites = [];
-let current = { time: 0 };
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
+let time = 0
+let sites = []
+let current = { time: 0 }
 
 let timer = setInterval(() => {
   chrome.tabs.query({ currentWindow: true }, arr => {
     if (arr.length) {
-      time++;
-      localStorage.setItem('time', time + '');
+      time++
+      localStorage.setItem('time', time + '')
     }
-  });
-}, 1000);
+  })
+}, 1000)
 
 chrome.runtime.onInstalled.addListener(function(details) {
   if (details.reason == 'install') {
-    localStorage.setItem('sites', JSON.stringify([]));
-    localStorage.setItem('time', 0 + '');
+    // localStorage.setItem('sites', JSON.stringify([]))
+    localStorage.setItem('time', 0 + '')
+    localStorage.setItem('allSites', JSON.stringify([]))
+    localStorage.setItem('customSites', JSON.stringify([]))
+    localStorage.setItem('customStats', JSON.stringify({}))
+    localStorage.setItem('allStats', JSON.stringify({}))
+    localStorage.setItem('useCustomSites', false)
+    localStorage.setItem('isOn', true)
     if (chrome.runtime.openOptionsPage) {
-      chrome.runtime.openOptionsPage();
+      chrome.runtime.openOptionsPage()
       // clearInterval(timer);
     } else {
-      window.open(chrome.runtime.getUrl('options.html'));
+      window.open(chrome.runtime.getUrl('options.html'))
     }
-    console.log('This is a first install!');
+    // console.log('This is a first install!')
   } else if (details.reason == 'update') {
+    // console.log('updated')
+    let useCustomSites = JSON.parse(localStorage.getItem('useCustomSites'))
+    sites = useCustomSites
+      ? JSON.parse(localStorage.getItem('customSites'))
+      : JSON.parse(localStorage.getItem('allSites'))
+    const isOn = JSON.parse(localStorage.getItem('isOn'))
+    if (!isOn) {
+      clearInterval(timer)
+    }
   }
-});
+})
 
 chrome.tabs.onActivated.addListener(function(activeInfo) {
-  console.log('opened', activeInfo.tabId);
-  let prev = JSON.parse(localStorage.getItem('current'));
-  if (!prev) {
-    prev = { tabId: 0, url: '', time: 0 };
-  }
-  // console.log('prev time before', prev.time);
-  prev.time = parseInt(localStorage.getItem('time'));
-  // console.log('prev time after', prev.time);
-  localStorage.setItem('time', 0 + '');
-  time = 0;
-  sites = JSON.parse(localStorage.getItem('sites'));
-  sites = sites.filter(site => {
-    if (site.url === prev.url) {
-      prev.time += site.time;
-      console.log('found one', prev);
-    }
-    if (activeInfo.tabId === prev.tabId) {
-      current = { ...prev };
-    } else if (activeInfo.tabId === site.tabId) {
-      current = { ...site };
-    }
-    return site.url !== prev.url;
-  });
-  if (prev.url !== '') {
-    console.log('sites', sites);
-    sites.push(prev);
-    localStorage.setItem('sites', JSON.stringify(sites));
-  }
+  chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
+    activeInfo.url = tabs[0].url
+      .split('/')
+      .slice(2, 3)
+      .join('/')
 
-  console.log('prev tab', prev);
-  console.log('current tab', current);
-  if (current.url !== '') {
-    localStorage.setItem('current', JSON.stringify(current));
-  }
-});
+    let useCustomSites = JSON.parse(localStorage.getItem('useCustomSites'))
+    let prev = JSON.parse(localStorage.getItem('current'))
+    if (!prev) {
+      prev = { url: '', time: 0 }
+    }
 
-let getCurrentUrl = () => {
-  let tablink;
-  chrome.tabs.getSelected(null, function(tab) {
-    tablink = tab.url;
-  });
-  return tablink;
-};
+    prev.time = parseInt(localStorage.getItem('time'))
+    localStorage.setItem('time', 0 + '')
+
+    time = 0
+    let flag = 0
+    sites = useCustomSites
+      ? JSON.parse(localStorage.getItem('customSites'))
+      : JSON.parse(localStorage.getItem('allSites'))
+    sites = sites.filter(site => {
+      if (site.url === prev.url) {
+        prev.time += site.time
+        flag = 1
+      }
+      if (activeInfo.url === prev.url) {
+        current = { ...prev }
+      } else if (activeInfo.url === site.url) {
+        current = { ...site }
+      }
+      return site.url !== prev.url
+    })
+
+    if (prev.url !== '') {
+      console.log('sites', sites)
+      let extension
+      chrome.runtime.getBackgroundPage(backPage => {
+        extension = backPage.document.domain
+
+        // console.log('prev url', prev.url)
+        // console.log('extention', extension)
+        if (prev.url === extension) {
+          const isOn = JSON.parse(localStorage.getItem('isOn'))
+          if (isOn) {
+            clearInterval(timer)
+            timer = setInterval(() => {
+              chrome.tabs.query({ currentWindow: true }, arr => {
+                if (arr.length) {
+                  time++
+                  localStorage.setItem('time', time + '')
+                }
+              })
+            }, 1000)
+          } else {
+            clearInterval(timer)
+          }
+          console.log(isOn)
+        }
+
+        if (current.url === extension) {
+          console.log('on extention page')
+          chrome.tabs.query({ active: true, currentWindow: true }, function(
+            tabs
+          ) {
+            chrome.tabs.update(tabs[0].id, { url: tabs[0].url })
+          })
+        }
+        if (prev.url !== extension) {
+          if (!prev.favicon) {
+            prev.favicon = 'https://' + prev.url + '/favicon.ico' || ''
+          }
+          console.log('useCustomSites', useCustomSites)
+          if (useCustomSites) {
+            if (flag) {
+              if (prev.date !== new Date().toLocaleDateString()) {
+                console.log('overdue')
+                let stats = JSON.parse(localStorage.getItem('customStats'))
+
+                stats[prev.date] = stats[prev.date]
+                  ? [...stats[prev.date], prev]
+                  : [prev]
+
+                localStorage.setItem('customStats', JSON.stringify(stats))
+              } else {
+                sites.push(prev)
+                localStorage.setItem('customSites', JSON.stringify(sites))
+              }
+            }
+          } else {
+            if (prev.date !== new Date().toLocaleDateString()) {
+              console.log('overdue')
+              let stats = JSON.parse(localStorage.getItem('allStats'))
+
+              stats[prev.date] = stats[prev.date]
+                ? [...stats[prev.date], prev]
+                : [prev]
+
+              localStorage.setItem('allStats', JSON.stringify(stats))
+            } else {
+              sites.push(prev)
+              localStorage.setItem('allSites', JSON.stringify(sites))
+            }
+          }
+        }
+      })
+    }
+
+    current.url = activeInfo.url
+
+    current.date = new Date().toLocaleDateString()
+    localStorage.setItem('current', JSON.stringify(current))
+    console.log('prev tab', prev)
+    console.log('current tab', current)
+  })
+})
+
+let getCurrentUrl = async () => {
+  let tablink = await chrome.tabs.query(
+    { active: true, lastFocusedWindow: true },
+    tabs => {
+      tablink = tabs[0].url
+        .split('/')
+        .slice(2, 3)
+        .join('/')
+      return tablink
+    }
+  )
+  return tablink
+}
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status == 'complete') {
-    console.log('opened info', tabId, changeInfo, tab);
-    console.log('sites from onUpdated', sites);
-    current = { tabId: tabId, url: tab.url, time: 0 };
-    let flag = 0;
+    current = {
+      url: tab.url
+        .split('/')
+        .slice(2, 3)
+        .join('/'),
+      time: 0,
+      favicon: tab.favIconUrl,
+      date: new Date().toLocaleDateString()
+    }
+    // let flag = 0
     sites.forEach(site => {
       if (site.url == tab.url) {
-        current = { ...site };
-        flag = 1;
+        current = { ...site }
+        // flag = 1
       }
-    });
+    })
 
-    localStorage.setItem('current', JSON.stringify(current));
-    current = { tabId: tabId, url: tab.url, time: 0 };
+    // console.log('reloaded', tab)
+
+    localStorage.setItem('current', JSON.stringify(current))
+    // current = {
+    //   tabId: tabId,
+    //   url: tab.url
+    //     .split('/')
+    //     .slice(2, 3)
+    //     .join('/'),
+    //   time: 0
+    // }
   }
-});
+})
 
 chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
-  console.log('closed', tabId, removeInfo);
-});
+  console.log('closed', tabId, removeInfo)
+})
 
 chrome.tabs.onReplaced.addListener((addedTabId, removedTabId) => {
-  console.log('replaced ', removedTabId, ' to ', addedTabId);
-});
+  console.log('replaced ', removedTabId, ' to ', addedTabId)
+})
