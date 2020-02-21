@@ -10,7 +10,9 @@ export const App = () => {
   const [mode, setMode] = useState(
     JSON.parse(localStorage.getItem('useCustomSites'))
   )
-  const [isOn, setOn] = useState(JSON.parse(localStorage.getItem('isOn')))
+  const [isOn, setOn] = useState(
+    JSON.parse(localStorage.getItem('isOn')) || false
+  )
 
   let sites = mode
     ? localStorage.getItem('customSites')

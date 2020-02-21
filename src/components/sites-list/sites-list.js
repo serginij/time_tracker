@@ -41,7 +41,7 @@ export const SitesList = ({ onModeChange, disabled }) => {
   }
 
   useEffect(() => {
-    setSites(JSON.parse(localStorage.getItem('customSites')))
+    setSites(JSON.parse(localStorage.getItem('customSites')) || [])
     setChecked(JSON.parse(localStorage.getItem('useCustomSites')))
   }, [])
 

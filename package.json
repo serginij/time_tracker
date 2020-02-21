@@ -17,6 +17,12 @@
     "not < 2%",
     "not ie 11"
   ],
+  "jest": {
+    "moduleNameMapper": {
+      "^@components(.*)$": "<rootDir>/src/components$1",
+      "\\.(jpg|jpeg|png|svg)$": "<rootDir>/src/__mocks__/fileMock.js"
+    }
+  },
   "dependencies": {
     "@babel/polyfill": "^7.6.0",
     "linaria": "^1.3.1",
