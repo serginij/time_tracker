@@ -1,27 +1,30 @@
 import React, { useState } from 'react'
 import { styled } from 'linaria/react'
+import { css } from 'linaria'
 
-import { Switch } from '../sites-list/switch'
+import { Wrapper, Button } from '@ui'
 
 export const TurnOff = ({ on = true, onChange }) => {
   const [checked, setChecked] = useState(on)
 
-  const handleCheck = e => {
-    localStorage.setItem('isOn', e.target.checked)
-    setChecked(e.target.checked)
-    onChange(e.target.checked)
+  const handleCheck = () => {
+    localStorage.setItem('isOn', !checked)
+    setChecked(!checked)
+    onChange(!checked)
   }
 
   return (
-    <SubTitle>
-      Turn on{' '}
-      <Switch
-        color="4caf50"
-        disabledColor="f44336"
-        checked={checked}
-        onClick={handleCheck}
-      />
-    </SubTitle>
+    <Wrapper>
+      <SubTitle>Глобальное выключение таймера</SubTitle>
+      <p>
+        Если вы хотите отключить таймер на всех сайтах, то нажмите на кнопку.
+        При отключении таймера статистика вестись не будет
+      </p>
+
+      <Button className={buttonStyles} type="button" onClick={handleCheck}>
+        {checked ? 'Отключить ' : 'Включить '}таймер
+      </Button>
+    </Wrapper>
   )
 }
 
@@ -30,9 +33,14 @@ const SubTitle = styled.h2`
   align-items: center;
   box-sizing: border-box;
   width: 100%;
-  justify-content: flex-end;
+  justify-content: center;
   padding-right: 3%;
   label {
     margin-left: 30px;
   }
+`
+
+const buttonStyles = css`
+  width: 200px;
+  margin: 20px 0;
 `

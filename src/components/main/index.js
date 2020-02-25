@@ -1,77 +1,52 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { styled } from 'linaria/react'
 
-import { formatTime } from './format-time'
+import { Table } from './table'
+import { SitesList } from '../sites-list/sites-list'
+import { TurnOff } from '../turn-off/'
+import { Stats } from '../stats/stats'
 
-export const Main = ({ sites = [] }) => {
-  let list = sites.map(item => {
-    // let sec = item.time
-    // let min, hrs
+export const Main = () => {
+  const [mode, setMode] = useState(
+    JSON.parse(localStorage.getItem('useCustomSites'))
+  )
+  const [isOn, setOn] = useState(
+    JSON.parse(localStorage.getItem('isOn')) || false
+  )
 
-    // if (sec > 60) {
-    //   min = (sec - (sec % 60)) / 60
-    //   sec = sec % 60
-    // } else {
-    //   min = (sec - (sec % 60)) / 60
-    // }
+  let sites = mode
+    ? localStorage.getItem('customSites')
+    : localStorage.getItem('allSites')
 
-    // if (min > 60) {
-    //   hrs = (min - (min % 60)) / 60
-    //   min = min % 60
-    // } else {
-    //   hrs = (min - (min % 60)) / 60
-    // }
-    return (
-      <Item key={item.url + item.time}>
-        <Website>{item.url}</Website>
-        <Time>
-          {formatTime(item.time).time}
-          {/* {(hrs ? (hrs < 10 ? '0' + hrs : hrs) + ':' : '') +
-            (min < 10 ? '0' + min : min) +
-            ':' +
-            (sec < 10 ? '0' + sec : sec)} */}
-        </Time>
-      </Item>
-    )
-  })
+  let stats = mode
+    ? localStorage.getItem('customStats')
+    : localStorage.getItem('allStats')
 
+  let onModeChange = mode => {
+    setMode(mode)
+  }
   return (
-    <>
-      <SubTitle>Time spent on websites</SubTitle>
-      <List data-testid="list">{list}</List>
-    </>
+    <div>
+      <Title>Limer options</Title>
+      <TurnOff on={isOn} onChange={val => setOn(val)} />
+      <Body on={isOn}>
+        <SitesList onModeChange={onModeChange} disabled={!isOn} />
+        <Table sites={JSON.parse(sites) || []} />
+        <Stats
+          stats={JSON.parse(stats) || {}}
+          sites={JSON.parse(sites) || []}
+        />
+      </Body>
+    </div>
   )
 }
 
-const SubTitle = styled.h2`
-  /* margin-left: 3%; */
-`
-
-const List = styled.ul`
-  list-style: none;
-  padding: 0 2%;
-`
-
-const Item = styled.li`
-  display: flex;
-  justify-content: space-between;
-  border-top: solid 1px black;
-  box-sizing: border-box;
-  padding: 0 3%;
-  align-items: center;
-
-  &:first-child {
-    border-top: none;
-  }
-`
-
-const Website = styled.p``
-
-const Time = styled.p`
-  border-left: 1px solid black;
-  padding: 1em 0 1em 1em;
-  height: 100%;
-  margin: 0;
-  min-width: 60px;
+const Title = styled.h1`
   text-align: center;
+`
+
+const Body = styled.div`
+  opacity: ${props => (props.on ? '1' : '0.5')};
+  margin: 0 3%;
+  cursor: initial;
 `
