@@ -1,16 +1,31 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Time tracker</title>
+    <meta charset="utf-8" />
+    <title>Limer</title>
     <link rel="stylesheet" href="popup.css"></link>
   </head>
   <body>
+    <header>
+      <img src="switch.svg" alt='turn off'>
+      <nav>
+        <p class='link' id='results'>Результаты</p>
+        <p class='link' id='settings'>Настройки</p>
+      </nav>
+    </header>
     <div class="root">
-      <h1>Time spent on this page</h1>
-      <p id="timer">00:00</p>
+      <div id='goal'>
+        <p class="goal-title">текущая цель:</p>
+        <p class="goal">20 часов в программировании</p>
+        <progress value='40' max='100'></progress>
+      </div>
+      <div class='time-block'>
+        <p id="timer">00:00</p>
+        <div class='tag'>Соцсети</div>
+      </div>
       <button id="stop">Stop</button>
-      <button id="settings">Go to settings</button>
     </div>
+    <p id='footer-text'>Created by TheBestF-ckingTeam</p>
     <script src="popup.js"></script>
   </body>
 </html>
