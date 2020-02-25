@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 import { styled } from 'linaria/react'
 
 import { Table } from './table'
-import { SitesList } from '../sites-list/sites-list'
-import { TurnOff } from '../turn-off/'
+import { SitesList } from '../settings/sites-list/sites-list'
+import { TurnOff } from '../settings/turn-off'
 import { Stats } from '../stats/stats'
 
 export const Main = () => {

@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { styled } from 'linaria/react'
 
-import { SitesList } from '../sites-list/sites-list'
-import { TurnOff } from '../turn-off/'
+import { SitesList } from './sites-list/sites-list'
+import { TurnOff } from './turn-off'
 
 export const Settings = () => {
   const [isOn, setOn] = useState(
