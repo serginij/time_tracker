@@ -1,52 +1,15 @@
-import React, { useState } from 'react'
-import { styled } from 'linaria/react'
+import React from 'react'
+import { Router } from 'react-router'
 
-import { Main } from './main'
-import { SitesList } from './sites-list/sites-list'
-import { TurnOff } from './turn-off/'
-import { Stats } from './stats/stats'
+import { Routes, history } from '../routes'
+import { CommonContent } from '@ui'
 
 export const App = () => {
-  const [mode, setMode] = useState(
-    JSON.parse(localStorage.getItem('useCustomSites'))
-  )
-  const [isOn, setOn] = useState(
-    JSON.parse(localStorage.getItem('isOn')) || false
-  )
-
-  let sites = mode
-    ? localStorage.getItem('customSites')
-    : localStorage.getItem('allSites')
-
-  let stats = mode
-    ? localStorage.getItem('customStats')
-    : localStorage.getItem('allStats')
-
-  let onModeChange = mode => {
-    setMode(mode)
-  }
   return (
-    <div>
-      <Title>Limer options</Title>
-      <TurnOff on={isOn} onChange={val => setOn(val)} />
-      <Body on={isOn}>
-        <SitesList onModeChange={onModeChange} disabled={!isOn} />
-        <Main sites={JSON.parse(sites) || []} />
-        <Stats
-          stats={JSON.parse(stats) || {}}
-          sites={JSON.parse(sites) || []}
-        />
-      </Body>
-    </div>
+    <Router history={history}>
+      <CommonContent>
+        <Routes />
+      </CommonContent>
+    </Router>
   )
 }
-
-const Title = styled.h1`
-  text-align: center;
-`
-
-const Body = styled.div`
-  opacity: ${props => (props.on ? '1' : '0.5')};
-  margin: 0 3%;
-  cursor: initial;
-`
