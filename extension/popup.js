@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
 let settingsButton = document.querySelector('#settings')
+let resultsButton = document.querySelector('#results')
 let stopButton = document.querySelector('#stop')
 let timerLabel = document.querySelector('#timer')
 
@@ -8,6 +9,15 @@ let stopped = false
 const isOn = JSON.parse(localStorage.getItem('isOn'))
 
 settingsButton.addEventListener('click', () => {
+  console.log('open options page')
+  if (chrome.runtime.openOptionsPage) {
+    chrome.runtime.openOptionsPage()
+  } else {
+    window.open(chrome.runtime.getUrl('options.html'))
+  }
+})
+
+resultsButton.addEventListener('click', () => {
   console.log('open options page')
   if (chrome.runtime.openOptionsPage) {
     chrome.runtime.openOptionsPage()
@@ -50,9 +60,9 @@ let timer = () =>
     }
 
     timerLabel.innerHTML =
-      (hrs ? (hrs < 10 ? '0' + hrs : hrs) + ':' : '') +
+      (hrs ? (hrs < 10 ? '0' + hrs : hrs) + ' : ' : '') +
       (min < 10 ? '0' + min : min) +
-      ':' +
+      ' : ' +
       (sec < 10 ? '0' + sec : sec)
     localStorage.setItem('time', sec + '')
   }, 1000))

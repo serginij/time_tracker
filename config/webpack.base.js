@@ -8,7 +8,8 @@ module.exports = {
   entry: './src/index.js',
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, '../dist')
+    path: path.resolve(__dirname, '../dist'),
+    publicPath: '/'
   },
   module: {
     rules: [
@@ -52,10 +53,14 @@ module.exports = {
       }
     ]
   },
+  devServer: {
+    historyApiFallback: true
+  },
   resolve: {
     alias: {
       '@components': path.resolve(__dirname, '../src/components/'),
-      '@assets': path.resolve(__dirname, '../src/assets/')
+      '@assets': path.resolve(__dirname, '../src/assets/'),
+      '@ui': path.resolve(__dirname, '../src/ui/')
     },
     extensions: ['.js']
   },
