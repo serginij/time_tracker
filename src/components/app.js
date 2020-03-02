@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Router, Redirect } from 'react-router'
 
 import { Routes, history } from '../routes'

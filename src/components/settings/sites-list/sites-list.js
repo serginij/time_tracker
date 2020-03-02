@@ -11,9 +11,12 @@ export const SitesList = ({ disabled }) => {
 
   const [checked, setChecked] = useState(false)
 
-  const handleAddSite = url => {
+  const handleAddSite = (url, label) => {
     let newSites = [...sites]
-    let newUrl = url.split('/')
+    let newUrl = url
+      .split('www.')
+      .join('')
+      .split('/')
     if (newUrl.length == 3) {
       newUrl.slice(2, 3)
     }
@@ -22,7 +25,8 @@ export const SitesList = ({ disabled }) => {
       newSites.push({
         url: url,
         favicon: 'https://' + url + '/favicon.ico',
-        time: 0
+        time: 0,
+        label: label
       })
     }
     localStorage.setItem('customSites', JSON.stringify(newSites))
@@ -31,6 +35,18 @@ export const SitesList = ({ disabled }) => {
 
   const handleDeleteSite = url => {
     let newSites = sites.filter(site => site.url !== url)
+    localStorage.setItem('customSites', JSON.stringify(newSites))
+    setSites(newSites)
+  }
+
+  const handleUpdateLabel = (url, label) => {
+    let newSites = sites.map(site => {
+      if (site.url === url) {
+        return { ...site, label: label }
+      }
+      return site
+    })
+
     localStorage.setItem('customSites', JSON.stringify(newSites))
     setSites(newSites)
   }
@@ -53,6 +69,8 @@ export const SitesList = ({ disabled }) => {
         url={site.url}
         favicon={site.favicon}
         time={site.time}
+        label={site.label.color ? site.label : { color: '#eeeeee', name: '' }}
+        onUpdate={handleUpdateLabel}
       />
       <CloseButton
         disabled={!checked || disabled}

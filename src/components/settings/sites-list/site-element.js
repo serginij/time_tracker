@@ -1,7 +1,28 @@
 import React from 'react'
 import { styled } from 'linaria/react'
 
-export const SiteElement = ({ favicon, url, time, border = true }) => {
+import { Dropdown } from '@ui'
+import { labels } from './labels'
+
+export const SiteElement = ({
+  favicon,
+  url,
+  time,
+  border = true,
+  label,
+  onUpdate
+}) => {
+  const buttons = labels.map(label => (
+    <Label
+      key={label.name + label.color}
+      color={label.color}
+      onClick={() => onUpdate(url, label)}
+      type="button"
+    >
+      {label.name}
+    </Label>
+  ))
+
   return (
     <Wrapper border={border}>
       <Img src={favicon} alt={favicon + ' logo'} />
@@ -9,9 +30,16 @@ export const SiteElement = ({ favicon, url, time, border = true }) => {
         <Name>{url}</Name>
         <Time>{Math.round(time / 60, 1) + ' min'}</Time>
       </div>
-      <Label color="#ff7878" type="button">
-        Работа
-      </Label>
+      <Dropdown
+        width={120}
+        align
+        close={false}
+        content={<Labels>{buttons}</Labels>}
+      >
+        <Label color={label.color} type="button">
+          {label.name}
+        </Label>
+      </Dropdown>
     </Wrapper>
   )
 }
@@ -53,10 +81,18 @@ const Label = styled.button`
   border-radius: 1rem;
   color: var(--primary-text);
   border: none;
-  margin-right: 10px;
+  margin: 4px 0;
   background-color: ${props => props.color};
+  cursor: pointer;
 
   &:focus {
     outline: 2px solid #fff;
   }
+`
+
+const Labels = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin: 10px;
+  width: 100%;
 `

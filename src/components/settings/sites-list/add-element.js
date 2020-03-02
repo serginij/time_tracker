@@ -2,21 +2,16 @@ import React, { useState } from 'react'
 import { styled } from 'linaria/react'
 
 import { Wrapper, Button } from '@ui'
-
-const labels = [
-  { name: 'Работа', color: '#FF7878' },
-  { name: 'Соцсети', color: '#758BFF' },
-  { name: 'Отдых', color: '#7CFFA1' },
-  { name: 'Хобби', color: '#F097FF' }
-]
+import { labels } from './labels'
 
 export const AddElement = ({ onAdd }) => {
   let [text, setText] = useState('')
   let [selected, setSelected] = useState('')
 
   const handleChange = e => setText(e.target.value)
-  const handleAdd = () => {
-    onAdd(text)
+  const handleAdd = e => {
+    e.preventDefault()
+    onAdd(text, selected)
     setText('')
   }
 
@@ -24,8 +19,8 @@ export const AddElement = ({ onAdd }) => {
     <Label
       key={label.name + label.color}
       color={label.color}
-      selected={label.name === selected}
-      onClick={() => setSelected(label.name)}
+      selected={label.name === selected.name}
+      onClick={() => setSelected(label)}
       type="button"
     >
       {label.name}
@@ -47,7 +42,7 @@ export const AddElement = ({ onAdd }) => {
           type="text"
           pattern="^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+$"
         />
-        <Button disabled={text.length === 0}>Добавить</Button>
+        <Button disabled={text == '' || selected == ''}>Добавить</Button>
       </Form>
       <Labels>{buttons}</Labels>
     </Wrapper>

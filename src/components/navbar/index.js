@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { styled } from 'linaria/react'
 import { css } from 'linaria'
 
@@ -15,6 +15,10 @@ const links = [
 
 export const Navbar = () => {
   const [current, setCurrent] = useState('/')
+
+  useEffect(() => {
+    setCurrent(location.pathname)
+  }, [])
 
   let items = links.map(link => (
     <Item
