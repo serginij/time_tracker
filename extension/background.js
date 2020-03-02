@@ -46,6 +46,8 @@ chrome.runtime.onInstalled.addListener(function(details) {
 chrome.tabs.onActivated.addListener(function(activeInfo) {
   chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
     activeInfo.url = tabs[0].url
+      .split('www.')
+      .join('')
       .split('/')
       .slice(2, 3)
       .join('/')
@@ -108,7 +110,14 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
           chrome.tabs.query({ active: true, currentWindow: true }, function(
             tabs
           ) {
-            chrome.tabs.update(tabs[0].id, { url: tabs[0].url })
+            console.log(tabs)
+            chrome.tabs.update(tabs[0].id, {
+              url:
+                tabs[0].url
+                  .split('/')
+                  .slice(0, 3)
+                  .join('/') + '/dist/index.html'
+            })
           })
         }
         if (prev.url !== extension) {
@@ -165,6 +174,8 @@ let getCurrentUrl = async () => {
     { active: true, lastFocusedWindow: true },
     tabs => {
       tablink = tabs[0].url
+        .split('www.')
+        .join('')
         .split('/')
         .slice(2, 3)
         .join('/')
@@ -178,6 +189,8 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status == 'complete') {
     current = {
       url: tab.url
+        .split('www.')
+        .join('')
         .split('/')
         .slice(2, 3)
         .join('/'),
