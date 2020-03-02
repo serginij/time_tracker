@@ -1,5 +1,5 @@
 import React from 'react'
-import { Router } from 'react-router'
+import { Router, Redirect } from 'react-router'
 
 import { Routes, history } from '../routes'
 import { CommonContent } from '@ui'
@@ -10,6 +10,7 @@ export const App = () => {
       <CommonContent>
         <Routes />
       </CommonContent>
+      <Redirect exact from="/" to="/settings" />
     </Router>
   )
 }
