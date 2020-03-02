@@ -19,8 +19,8 @@ chrome.runtime.onInstalled.addListener(function(details) {
     localStorage.setItem('time', 0 + '')
     localStorage.setItem('allSites', JSON.stringify([]))
     localStorage.setItem('customSites', JSON.stringify([]))
-    localStorage.setItem('customStats', JSON.stringify({}))
-    localStorage.setItem('allStats', JSON.stringify({}))
+    localStorage.setItem('customStats', JSON.stringify([]))
+    localStorage.setItem('allStats', JSON.stringify([]))
     localStorage.setItem('useCustomSites', false)
     localStorage.setItem('isOn', true)
     if (chrome.runtime.openOptionsPage) {
