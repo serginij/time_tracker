@@ -10,12 +10,12 @@ export const Stats = () => {
   const mode = JSON.parse(localStorage.getItem('useCustomSites'))
 
   let sites = mode
-    ? localStorage.getItem('customSites')
-    : localStorage.getItem('allSites')
+    ? localStorage.getItem('customSites') || '[]'
+    : localStorage.getItem('allSites') || '[]'
 
   let stats = mode
-    ? localStorage.getItem('customStats')
-    : localStorage.getItem('allStats')
+    ? localStorage.getItem('customStats') || '[]'
+    : localStorage.getItem('allStats') || '[]'
 
   console.log(stats, sites)
   return (

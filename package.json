@@ -20,7 +20,8 @@
   "jest": {
     "moduleNameMapper": {
       "^@components(.*)$": "<rootDir>/src/components$1",
-      "\\.(jpg|jpeg|png|svg)$": "<rootDir>/src/__mocks__/fileMock.js"
+      "\\.(jpg|jpeg|png|svg|css)$": "<rootDir>/src/__mocks__/fileMock.js",
+      "^@ui(.*)$": "<rootDir>/src/ui$1"
     }
   },
   "dependencies": {
