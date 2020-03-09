@@ -7,6 +7,7 @@ export const Label = styled.button`
   width: 100px;
   height: 2rem;
   font-size: 14px;
+  font-family: inherit;
   border-radius: 1rem;
   color: var(--primary-text);
   border: none;

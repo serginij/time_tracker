@@ -41,7 +41,7 @@ export const Navbar = () => {
 
 const Wrapper = styled.nav`
   width: 200px;
-
+  font-family: 'Marmelad', sans-serif;
   background-color: var(--primary);
 `
 

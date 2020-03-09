@@ -5,6 +5,7 @@ export const Button = styled.button`
   background-color: var(--primary__dark);
   border-radius: 3px;
   font-size: 14px;
+  font-family: inherit;
   color: #ffffff;
   border: none;
   cursor: pointer;
