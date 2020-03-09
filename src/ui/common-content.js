@@ -22,6 +22,7 @@ const Body = styled.div`
   flex-direction: row;
   width: 100%;
   min-height: 100vh;
+  font-size: 16px;
   font-family: sans-serif;
 `
 

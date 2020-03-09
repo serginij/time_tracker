@@ -6,6 +6,7 @@ import { Button } from '@ui'
 import { history } from '../../routes'
 
 import icon from '@assets/icon_128.png'
+import background from '../../assets/about_back.png'
 
 export const About = () => {
   const goToSettings = () => {
@@ -91,7 +92,7 @@ const Header = styled.header`
       rgba(21, 89, 142, 0) 20.31%,
       rgba(21, 89, 142, 0.8) 100%
     ),
-    center / cover no-repeat utl('src/assets/about_back.png');
+    center / cover no-repeat url(${background});
 
   height: 400px;
   display: flex;
@@ -154,6 +155,7 @@ const InfoBlock = styled.article`
   width: 50%;
   color: white;
   margin-right: 5%;
+  max-width: 650px;
 
   button {
     width: 140px;
