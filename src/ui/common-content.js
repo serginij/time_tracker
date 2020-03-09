@@ -27,5 +27,6 @@ const Body = styled.div`
 
 const Wrapper = styled.div`
   background-color: var(--secondary);
+  font-family: 'Marmelad', sans-serif;
   width: 100%;
 `
