@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { styled } from 'linaria/react'
 
-import { Wrapper, Button } from '@ui'
+import { Wrapper, Button, Label } from '@ui'
 import { labels } from './labels'
 
 export const AddElement = ({ onAdd }) => {
@@ -67,6 +67,7 @@ const Input = styled.input`
   margin-bottom: 8px;
   padding: 8px 0 8px 12px;
   font: inherit;
+  font-family: Roboto;
 
   &:focus {
     outline: 2px solid var(--primary);
@@ -81,23 +82,4 @@ const Labels = styled.div`
   display: flex;
   margin: 30px 0;
   width: 100%;
-`
-
-const Label = styled.button`
-  text-decoration: none;
-  margin: 0;
-  padding: 0;
-  width: 100px;
-  height: 2rem;
-  font-size: 14px;
-  border-radius: 1rem;
-  color: var(--primary-text);
-  border: none;
-  cursor: pointer;
-  margin-right: 10px;
-  background-color: ${props => (props.selected ? props.color : '#cccccc')};
-
-  &:focus {
-    outline: 2px solid #fff;
-  }
 `
