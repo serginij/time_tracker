@@ -15,7 +15,6 @@ let timer = setInterval(() => {
 
 chrome.runtime.onInstalled.addListener(function(details) {
   if (details.reason == 'install') {
-    // localStorage.setItem('sites', JSON.stringify([]))
     localStorage.setItem('time', 0 + '')
     localStorage.setItem('allSites', JSON.stringify([]))
     localStorage.setItem('customSites', JSON.stringify([]))
@@ -25,7 +24,6 @@ chrome.runtime.onInstalled.addListener(function(details) {
     localStorage.setItem('isOn', true)
     if (chrome.runtime.openOptionsPage) {
       chrome.runtime.openOptionsPage()
-      // clearInterval(timer);
     } else {
       window.open(chrome.runtime.getUrl('options.html'))
     }
@@ -74,10 +72,12 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
       if (activeInfo.url === prev.url) {
         current = { ...prev }
       } else if (activeInfo.url === site.url) {
+        console.log('current = site', site)
         current = { ...site }
       }
       return site.url !== prev.url
     })
+    console.log('PREV', prev)
 
     if (prev.url !== '') {
       console.log('sites', sites)
@@ -164,8 +164,6 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
 
     current.date = new Date().toLocaleDateString()
     localStorage.setItem('current', JSON.stringify(current))
-    console.log('prev tab', prev)
-    console.log('current tab', current)
   })
 })
 
@@ -187,6 +185,7 @@ let getCurrentUrl = async () => {
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status == 'complete') {
+    console.log(tab)
     current = {
       url: tab.url
         .split('www.')
@@ -198,25 +197,19 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       favicon: tab.favIconUrl,
       date: new Date().toLocaleDateString()
     }
-    // let flag = 0
+    let useCustomSites = JSON.parse(localStorage.getItem('useCustomSites'))
+
+    sites = useCustomSites
+      ? JSON.parse(localStorage.getItem('customSites'))
+      : JSON.parse(localStorage.getItem('allSites'))
+
     sites.forEach(site => {
-      if (site.url == tab.url) {
-        current = { ...site }
-        // flag = 1
+      if (site.url == current.url) {
+        current = { ...current, ...site }
       }
     })
 
-    // console.log('reloaded', tab)
-
     localStorage.setItem('current', JSON.stringify(current))
-    // current = {
-    //   tabId: tabId,
-    //   url: tab.url
-    //     .split('/')
-    //     .slice(2, 3)
-    //     .join('/'),
-    //   time: 0
-    // }
   }
 })
 
