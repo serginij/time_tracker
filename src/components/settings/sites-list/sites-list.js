@@ -75,6 +75,7 @@ export const SitesList = ({ disabled }) => {
       <CloseButton
         disabled={!checked || disabled}
         onClick={() => handleDeleteSite(site.url)}
+        data-testid="del-list"
       >
         {'×'}
       </CloseButton>
@@ -85,9 +86,14 @@ export const SitesList = ({ disabled }) => {
       <Wrapper>
         <Header>
           <SubTitle>Избранные сайты: </SubTitle>
-          <Switch onClick={handleCheck} checked={checked} disabled={disabled} />
+          <Switch
+            data-testid="checkbox-on"
+            onClick={handleCheck}
+            checked={checked || false}
+            disabled={disabled}
+          />
         </Header>
-        <List checked={checked}>
+        <List checked={checked} data-testid="favorite-list">
           {list}
           {/* <Item>
           <AddElement disabled={!checked || disabled} onClick={handleAddSite} />

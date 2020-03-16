@@ -26,7 +26,7 @@ export const Stats = () => {
       <Wrapper className={favBlock}>
         <h2>Избранные сайты:</h2>
         <Sites>
-          {JSON.parse(localStorage.getItem('customSites')).map(
+          {(JSON.parse(localStorage.getItem('customSites')) || []).map(
             (site, index) => {
               if (index < 5)
                 return (
