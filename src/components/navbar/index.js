@@ -3,6 +3,8 @@ import { styled } from 'linaria/react'
 import { css } from 'linaria'
 
 import { Link } from 'react-router-dom'
+
+import { history } from '../../routes'
 import about from '@assets/about.svg'
 import settings from '@assets/settings.svg'
 import stats from '@assets/stats.svg'
@@ -18,6 +20,12 @@ export const Navbar = () => {
 
   useEffect(() => {
     setCurrent(location.pathname)
+    const unlisten = history.listen(location => {
+      setCurrent(location.pathname)
+    })
+    return () => {
+      unlisten()
+    }
   }, [])
 
   let items = links.map(link => (

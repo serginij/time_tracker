@@ -20,7 +20,7 @@ export const Today = ({ stats = {}, sites = [] }) => {
   const getTime = array =>
     array.reduce((acc, site) => {
       let siteTime = formatTime(site.time)
-      return acc + siteTime.hrs + siteTime.min / 60
+      return +(acc + siteTime.hrs + siteTime.min / 60).toFixed(2)
     }, 0)
 
   const todayTime = getTime(sites)

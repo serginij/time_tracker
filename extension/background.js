@@ -7,8 +7,8 @@ let current = { time: 0 }
 let timer = setInterval(() => {
   chrome.tabs.query({ currentWindow: true }, arr => {
     if (arr.length) {
-      time++
-      localStorage.setItem('time', time + '')
+      time = +localStorage.getItem('time') + 1
+      localStorage.setItem('time', time)
     }
   })
 }, 1000)
@@ -56,7 +56,7 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
       prev = { url: '', time: 0 }
     }
 
-    prev.time = parseInt(localStorage.getItem('time'))
+    prev.time = prev.stop ? 0 : parseInt(localStorage.getItem('time'))
     localStorage.setItem('time', 0 + '')
 
     time = 0
@@ -105,26 +105,11 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
           console.log(isOn)
         }
 
-        if (current.url === extension) {
-          console.log('on extention page')
-          chrome.tabs.query({ active: true, currentWindow: true }, function(
-            tabs
-          ) {
-            console.log(tabs)
-            chrome.tabs.update(tabs[0].id, {
-              url:
-                tabs[0].url
-                  .split('/')
-                  .slice(0, 3)
-                  .join('/') + '/dist/index.html'
-            })
-          })
-        }
         if (prev.url !== extension) {
           if (!prev.favicon) {
             prev.favicon = 'https://' + prev.url + '/favicon.ico' || ''
           }
-          console.log('useCustomSites', useCustomSites)
+          console.log('prev.url !== extension')
           if (useCustomSites) {
             if (flag) {
               if (prev.date !== new Date().toLocaleDateString()) {
@@ -156,6 +141,46 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
               localStorage.setItem('allSites', JSON.stringify(sites))
             }
           }
+        }
+
+        if (current.url === extension) {
+          console.log('on extention page, current.url === extension')
+          let stats = JSON.parse(
+            localStorage.getItem(useCustomSites ? 'customStats' : 'allStats')
+          )
+          let sites = JSON.parse(
+            localStorage.getItem(useCustomSites ? 'customSites' : 'allSites')
+          ).filter(site => {
+            if (site.date !== new Date().toLocaleDateString()) {
+              stats[site.date] = stats[site.date]
+                ? [...stats[site.date], site]
+                : [site]
+            }
+            return site.date === new Date().toLocaleDateString()
+          })
+
+          localStorage.setItem(
+            useCustomSites ? 'customStats' : 'allStats',
+            JSON.stringify(stats)
+          )
+          localStorage.setItem(
+            useCustomSites ? 'customSites' : 'allSites',
+            JSON.stringify(sites)
+          )
+          console.log('store new filtered SITES', sites, stats)
+
+          chrome.tabs.query({ active: true, currentWindow: true }, function(
+            tabs
+          ) {
+            console.log(tabs)
+            chrome.tabs.update(tabs[0].id, {
+              url:
+                tabs[0].url
+                  .split('/')
+                  .slice(0, 3)
+                  .join('/') + '/dist/index.html'
+            })
+          })
         }
       })
     }

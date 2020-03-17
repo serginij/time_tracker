@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Router, Redirect } from 'react-router'
 
 import { Routes, history } from '../routes'
@@ -10,7 +10,11 @@ export const App = () => {
       <CommonContent>
         <Routes />
       </CommonContent>
-      <Redirect exact from="/" to="/settings" />
+      <Redirect
+        exact
+        from="/"
+        to={{ pathname: '/settings', search: location.search }}
+      />
     </Router>
   )
 }

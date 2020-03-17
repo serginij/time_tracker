@@ -3,11 +3,16 @@ import { styled } from 'linaria/react'
 
 import { SitesList } from './sites-list/sites-list'
 import { TurnOff } from './turn-off'
+import { history } from '../../routes'
 
 export const Settings = () => {
   const [isOn, setOn] = useState(
     JSON.parse(localStorage.getItem('isOn')) || false
   )
+
+  if (history.location.search == '?to=stats') {
+    history.replace('/stats')
+  }
 
   return (
     <div>

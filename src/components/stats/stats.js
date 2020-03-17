@@ -18,7 +18,6 @@ export const Stats = () => {
     ? localStorage.getItem('customStats') || '[]'
     : localStorage.getItem('allStats') || '[]'
 
-  console.log(stats, sites)
   let count = 0
   return (
     <>
@@ -51,9 +50,11 @@ export const Stats = () => {
       <Wrapper className={chartStyle}>
         <Today stats={JSON.parse(stats)} sites={JSON.parse(sites)} />
       </Wrapper>
-      <Wrapper className={chartStyle}>
-        <StatsByLabels tats={JSON.parse(stats)} sites={JSON.parse(sites)} />
-      </Wrapper>
+      {mode && (
+        <Wrapper className={chartStyle}>
+          <StatsByLabels tats={JSON.parse(stats)} sites={JSON.parse(sites)} />
+        </Wrapper>
+      )}
     </>
   )
 }
