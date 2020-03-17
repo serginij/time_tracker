@@ -4,7 +4,7 @@ import { styled } from 'linaria/react'
 export const Switch = ({
   onClick,
   checked = false,
-  color = '2196f3',
+  color,
   disabledColor = 'cccccc',
   disabled = false
 }) => {
@@ -32,7 +32,8 @@ const Label = styled.label`
     height: 0;
 
     &:checked + .slider {
-      background-color: ${props => '#' + props.color};
+      background-color: ${props =>
+        props.color ? props.color : 'var(--primary)'};
     }
 
     &:focus + .slider {

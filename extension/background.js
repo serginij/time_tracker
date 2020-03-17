@@ -7,25 +7,23 @@ let current = { time: 0 }
 let timer = setInterval(() => {
   chrome.tabs.query({ currentWindow: true }, arr => {
     if (arr.length) {
-      time++
-      localStorage.setItem('time', time + '')
+      time = +localStorage.getItem('time') + 1
+      localStorage.setItem('time', time)
     }
   })
 }, 1000)
 
 chrome.runtime.onInstalled.addListener(function(details) {
   if (details.reason == 'install') {
-    // localStorage.setItem('sites', JSON.stringify([]))
     localStorage.setItem('time', 0 + '')
     localStorage.setItem('allSites', JSON.stringify([]))
     localStorage.setItem('customSites', JSON.stringify([]))
-    localStorage.setItem('customStats', JSON.stringify({}))
-    localStorage.setItem('allStats', JSON.stringify({}))
+    localStorage.setItem('customStats', JSON.stringify([]))
+    localStorage.setItem('allStats', JSON.stringify([]))
     localStorage.setItem('useCustomSites', false)
     localStorage.setItem('isOn', true)
     if (chrome.runtime.openOptionsPage) {
       chrome.runtime.openOptionsPage()
-      // clearInterval(timer);
     } else {
       window.open(chrome.runtime.getUrl('options.html'))
     }
@@ -46,6 +44,8 @@ chrome.runtime.onInstalled.addListener(function(details) {
 chrome.tabs.onActivated.addListener(function(activeInfo) {
   chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
     activeInfo.url = tabs[0].url
+      .split('www.')
+      .join('')
       .split('/')
       .slice(2, 3)
       .join('/')
@@ -56,7 +56,7 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
       prev = { url: '', time: 0 }
     }
 
-    prev.time = parseInt(localStorage.getItem('time'))
+    prev.time = prev.stop ? 0 : parseInt(localStorage.getItem('time'))
     localStorage.setItem('time', 0 + '')
 
     time = 0
@@ -72,10 +72,12 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
       if (activeInfo.url === prev.url) {
         current = { ...prev }
       } else if (activeInfo.url === site.url) {
+        console.log('current = site', site)
         current = { ...site }
       }
       return site.url !== prev.url
     })
+    console.log('PREV', prev)
 
     if (prev.url !== '') {
       console.log('sites', sites)
@@ -103,19 +105,11 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
           console.log(isOn)
         }
 
-        if (current.url === extension) {
-          console.log('on extention page')
-          chrome.tabs.query({ active: true, currentWindow: true }, function(
-            tabs
-          ) {
-            chrome.tabs.update(tabs[0].id, { url: tabs[0].url })
-          })
-        }
         if (prev.url !== extension) {
           if (!prev.favicon) {
             prev.favicon = 'https://' + prev.url + '/favicon.ico' || ''
           }
-          console.log('useCustomSites', useCustomSites)
+          console.log('prev.url !== extension')
           if (useCustomSites) {
             if (flag) {
               if (prev.date !== new Date().toLocaleDateString()) {
@@ -148,6 +142,46 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
             }
           }
         }
+
+        if (current.url === extension) {
+          console.log('on extention page, current.url === extension')
+          let stats = JSON.parse(
+            localStorage.getItem(useCustomSites ? 'customStats' : 'allStats')
+          )
+          let sites = JSON.parse(
+            localStorage.getItem(useCustomSites ? 'customSites' : 'allSites')
+          ).filter(site => {
+            if (site.date !== new Date().toLocaleDateString()) {
+              stats[site.date] = stats[site.date]
+                ? [...stats[site.date], site]
+                : [site]
+            }
+            return site.date === new Date().toLocaleDateString()
+          })
+
+          localStorage.setItem(
+            useCustomSites ? 'customStats' : 'allStats',
+            JSON.stringify(stats)
+          )
+          localStorage.setItem(
+            useCustomSites ? 'customSites' : 'allSites',
+            JSON.stringify(sites)
+          )
+          console.log('store new filtered SITES', sites, stats)
+
+          chrome.tabs.query({ active: true, currentWindow: true }, function(
+            tabs
+          ) {
+            console.log(tabs)
+            chrome.tabs.update(tabs[0].id, {
+              url:
+                tabs[0].url
+                  .split('/')
+                  .slice(0, 3)
+                  .join('/') + '/dist/index.html'
+            })
+          })
+        }
       })
     }
 
@@ -155,8 +189,6 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
 
     current.date = new Date().toLocaleDateString()
     localStorage.setItem('current', JSON.stringify(current))
-    console.log('prev tab', prev)
-    console.log('current tab', current)
   })
 })
 
@@ -165,6 +197,8 @@ let getCurrentUrl = async () => {
     { active: true, lastFocusedWindow: true },
     tabs => {
       tablink = tabs[0].url
+        .split('www.')
+        .join('')
         .split('/')
         .slice(2, 3)
         .join('/')
@@ -176,8 +210,11 @@ let getCurrentUrl = async () => {
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status == 'complete') {
+    console.log(tab)
     current = {
       url: tab.url
+        .split('www.')
+        .join('')
         .split('/')
         .slice(2, 3)
         .join('/'),
@@ -185,25 +222,19 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       favicon: tab.favIconUrl,
       date: new Date().toLocaleDateString()
     }
-    // let flag = 0
+    let useCustomSites = JSON.parse(localStorage.getItem('useCustomSites'))
+
+    sites = useCustomSites
+      ? JSON.parse(localStorage.getItem('customSites'))
+      : JSON.parse(localStorage.getItem('allSites'))
+
     sites.forEach(site => {
-      if (site.url == tab.url) {
-        current = { ...site }
-        // flag = 1
+      if (site.url == current.url) {
+        current = { ...current, ...site }
       }
     })
 
-    // console.log('reloaded', tab)
-
     localStorage.setItem('current', JSON.stringify(current))
-    // current = {
-    //   tabId: tabId,
-    //   url: tab.url
-    //     .split('/')
-    //     .slice(2, 3)
-    //     .join('/'),
-    //   time: 0
-    // }
   }
 })
 
