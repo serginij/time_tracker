@@ -18,8 +18,8 @@ chrome.runtime.onInstalled.addListener(function(details) {
     localStorage.setItem('time', 0 + '')
     localStorage.setItem('allSites', JSON.stringify([]))
     localStorage.setItem('customSites', JSON.stringify([]))
-    localStorage.setItem('customStats', JSON.stringify([]))
-    localStorage.setItem('allStats', JSON.stringify([]))
+    localStorage.setItem('customStats', JSON.stringify({}))
+    localStorage.setItem('allStats', JSON.stringify({}))
     localStorage.setItem('useCustomSites', false)
     localStorage.setItem('isOn', true)
     if (chrome.runtime.openOptionsPage) {
@@ -27,17 +27,35 @@ chrome.runtime.onInstalled.addListener(function(details) {
     } else {
       window.open(chrome.runtime.getUrl('options.html'))
     }
-    // console.log('This is a first install!')
   } else if (details.reason == 'update') {
-    // console.log('updated')
     let useCustomSites = JSON.parse(localStorage.getItem('useCustomSites'))
-    sites = useCustomSites
-      ? JSON.parse(localStorage.getItem('customSites'))
-      : JSON.parse(localStorage.getItem('allSites'))
     const isOn = JSON.parse(localStorage.getItem('isOn'))
     if (!isOn) {
       clearInterval(timer)
     }
+
+    let stats = JSON.parse(
+      localStorage.getItem(useCustomSites ? 'customStats' : 'allStats')
+    )
+    sites = JSON.parse(
+      localStorage.getItem(useCustomSites ? 'customSites' : 'allSites')
+    ).filter(site => {
+      if (site.date !== new Date().toLocaleDateString()) {
+        stats[site.date] = stats[site.date]
+          ? [...stats[site.date], site]
+          : [site]
+      }
+      return site.date === new Date().toLocaleDateString()
+    })
+
+    localStorage.setItem(
+      useCustomSites ? 'customStats' : 'allStats',
+      JSON.stringify(stats)
+    )
+    localStorage.setItem(
+      useCustomSites ? 'customSites' : 'allSites',
+      JSON.stringify(sites)
+    )
   }
 })
 
@@ -85,8 +103,6 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
       chrome.runtime.getBackgroundPage(backPage => {
         extension = backPage.document.domain
 
-        // console.log('prev url', prev.url)
-        // console.log('extention', extension)
         if (prev.url === extension) {
           const isOn = JSON.parse(localStorage.getItem('isOn'))
           if (isOn) {
@@ -109,11 +125,9 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
           if (!prev.favicon) {
             prev.favicon = 'https://' + prev.url + '/favicon.ico' || ''
           }
-          console.log('prev.url !== extension')
           if (useCustomSites) {
             if (flag) {
               if (prev.date !== new Date().toLocaleDateString()) {
-                console.log('overdue')
                 let stats = JSON.parse(localStorage.getItem('customStats'))
 
                 stats[prev.date] = stats[prev.date]
@@ -128,7 +142,6 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
             }
           } else {
             if (prev.date !== new Date().toLocaleDateString()) {
-              console.log('overdue')
               let stats = JSON.parse(localStorage.getItem('allStats'))
 
               stats[prev.date] = stats[prev.date]
@@ -144,7 +157,6 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
         }
 
         if (current.url === extension) {
-          console.log('on extention page, current.url === extension')
           let stats = JSON.parse(
             localStorage.getItem(useCustomSites ? 'customStats' : 'allStats')
           )
@@ -167,7 +179,6 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
             useCustomSites ? 'customSites' : 'allSites',
             JSON.stringify(sites)
           )
-          console.log('store new filtered SITES', sites, stats)
 
           chrome.tabs.query({ active: true, currentWindow: true }, function(
             tabs
