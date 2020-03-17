@@ -42,7 +42,12 @@ export const AddElement = ({ onAdd }) => {
           type="text"
           pattern="^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+$"
         />
-        <Button disabled={text == '' || selected == ''}>Добавить</Button>
+        <Button
+          disabled={text == '' || selected == ''}
+          data-testid="button-add"
+        >
+          Добавить
+        </Button>
       </Form>
       <Labels>{buttons}</Labels>
     </Wrapper>
