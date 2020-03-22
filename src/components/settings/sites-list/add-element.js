@@ -4,7 +4,7 @@ import { styled } from 'linaria/react'
 import { Wrapper, Button, Label } from '@ui'
 import { labels } from './labels'
 
-export const AddElement = ({ onAdd }) => {
+export const AddElement = ({ onAdd, disabled }) => {
   let [text, setText] = useState('')
   let [selected, setSelected] = useState('')
 
@@ -22,6 +22,7 @@ export const AddElement = ({ onAdd }) => {
       selected={label.name === selected.name}
       onClick={() => setSelected(label)}
       type="button"
+      disabled={disabled}
     >
       {label.name}
     </Label>
@@ -41,9 +42,10 @@ export const AddElement = ({ onAdd }) => {
           onChange={handleChange}
           type="text"
           pattern="^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+$"
+          disabled={disabled}
         />
         <Button
-          disabled={text == '' || selected == ''}
+          disabled={text == '' || selected == '' || disabled}
           data-testid="button-add"
         >
           Добавить
@@ -73,9 +75,13 @@ const Input = styled.input`
   padding: 8px 0 8px 12px;
   font: inherit;
   font-family: Roboto;
+  visibility: ${props => (props.hidden ? 'hidden' : 'visible')};
 
   &:focus {
     outline: 2px solid var(--primary);
+  }
+  &:disabled {
+    cursor: not-allowed;
   }
 `
 

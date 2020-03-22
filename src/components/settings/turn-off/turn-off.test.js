@@ -1,12 +1,12 @@
 import React from 'react'
-import { AddElement } from './add-element'
-import { SitesList, Header, Switch } from './sites-list'
+import { AddElement } from '../sites-list/add-element'
+import { SitesList, Header, Switch } from '../sites-list/sites-list'
+import { Settings, TurnOff } from '../index'
 import { render, cleanup, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 
 afterEach(cleanup)
-// render
-export const renderList = () => {
+const renderList = () => {
   const { getByTestId, queryAllByTestId, queryAllByRole } = render(
     <SitesList disabled={false}>
       <Header>
@@ -16,33 +16,50 @@ export const renderList = () => {
   )
   return { getByTestId, queryAllByTestId, queryAllByRole }
 }
-export const renderInput = () => {
+const renderInput = () => {
   const { queryAllByRole, getByText, getByRole } = render(<AddElement />)
   return { queryAllByRole, getByText, getByRole }
 }
-describe('add to favorite sites', () => {
-  test('conteins 3 elements', () => {
-    const listUrl = ['google.com', 'habr.com', 'vk.com', 'yandex.ru', 'asm.com']
-    const { getByTestId } = renderList()
-    const list = getByTestId('favorite-list')
-    addSites(listUrl)
-    expect(list.children).toHaveLength(5)
-  })
+const renderTurnOff = () => {
+  const { getByTestId } = render(
+    <Settings>
+      <TurnOff></TurnOff>
+    </Settings>
+  )
+  return { getByTestId }
+}
 
-  test('delete elements', () => {
-    const listUrl = ['google.com', 'habr.com', 'vk.com', 'yandex.ru', 'asm.com']
+describe('off timer', () => {
+  test('off timer add list', () => {
+    const listUrl = [
+      'google.com',
+      'habr.com',
+      'vk.com',
+      'yandex.ru',
+      'asm.com',
+      'fd.com',
+      'ui.com'
+    ]
     const { queryAllByTestId } = renderList()
     const list = queryAllByTestId('favorite-list')[0]
-    //добавление
+    const { getByTestId } = renderTurnOff()
+
+    fireEvent.click(getByTestId('off-button'))
     addSites(listUrl)
-    //удаление
+
+    expect(list.children).toHaveLength(7)
+  })
+
+  test('off timer delete list', () => {
+    const { queryAllByTestId } = renderList()
+    const list = queryAllByTestId('favorite-list')[0]
     checkbox()
-    deleteSites(queryAllByTestId, 0)
-    expect(list.children).toHaveLength(4)
+    deleteSites(queryAllByTestId, 1)
+    expect(list.children).toHaveLength(6)
   })
 })
 
-export const addSites = listUrl => {
+const addSites = listUrl => {
   const { queryAllByRole } = renderInput()
 
   for (let i = 0; i < listUrl.length; i++) {
@@ -57,10 +74,10 @@ export const addSites = listUrl => {
     fireEvent.click(btn)
   }
 }
-export const deleteSites = (queryAllByTestId, i) => {
-  fireEvent.click(queryAllByTestId('del-list')[i]) || false
+const deleteSites = (queryAllByTestId, i) => {
+  fireEvent.click(queryAllByTestId('del-list')[i])
 }
-export const checkbox = () => {
+const checkbox = () => {
   const checkbox = renderList().queryAllByRole('checkbox')[0]
   fireEvent.click(checkbox)
 }

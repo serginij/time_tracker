@@ -21,7 +21,12 @@ export const TurnOff = ({ on = true, onChange }) => {
         При отключении таймера статистика вестись не будет
       </p>
 
-      <Button className={buttonStyles} type="button" onClick={handleCheck}>
+      <Button
+        data-testid="off-button"
+        className={buttonStyles}
+        type="button"
+        onClick={handleCheck}
+      >
         {checked ? 'Отключить ' : 'Включить '}таймер
       </Button>
     </Wrapper>
