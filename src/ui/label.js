@@ -18,4 +18,7 @@ export const Label = styled.button`
   &:focus {
     outline: 2px solid #fff;
   }
+  &:disabled {
+    cursor: not-allowed;
+  }
 `

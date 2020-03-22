@@ -1,5 +1,6 @@
 import React from 'react'
 import { styled } from 'linaria/react'
+import { css } from 'linaria'
 
 import { Dropdown, Label } from '@ui'
 import { labels } from './labels'
@@ -10,7 +11,8 @@ export const SiteElement = ({
   time,
   border = true,
   label,
-  onUpdate
+  onUpdate,
+  disabled
 }) => {
   const buttons = labels.map(label => (
     <Label
@@ -18,6 +20,8 @@ export const SiteElement = ({
       color={label.color}
       onClick={() => onUpdate(url, label)}
       type="button"
+      selected
+      className={labelStyles}
     >
       {label.name}
     </Label>
@@ -30,16 +34,22 @@ export const SiteElement = ({
         <Name>{url}</Name>
         <Time>{Math.round(time / 60, 1) + ' min'}</Time>
       </div>
-      <Dropdown
-        width={120}
-        align
-        close={false}
-        content={<Labels>{buttons}</Labels>}
-      >
-        <Label selected color={label.color} type="button">
+      {disabled ? (
+        <Label color={label.color} type="button">
           {label.name}
         </Label>
-      </Dropdown>
+      ) : (
+        <Dropdown
+          width={120}
+          align
+          close={false}
+          content={<Labels>{buttons}</Labels>}
+        >
+          <Label selected color={label.color} type="button">
+            {label.name}
+          </Label>
+        </Dropdown>
+      )}
     </Wrapper>
   )
 }
@@ -73,24 +83,9 @@ const Wrapper = styled.div`
   padding: 10px;
 `
 
-// const Label = styled.button`
-//   text-decoration: none;
-//   margin: 0;
-//   padding: 0;
-//   width: 100px;
-//   height: 2rem;
-//   font-size: 14px;
-//   border-radius: 1rem;
-//   color: var(--primary-text);
-//   border: none;
-//   margin: 4px 0;
-//   background-color: ${props => props.color};
-//   cursor: pointer;
-
-//   &:focus {
-//     outline: 2px solid #fff;
-//   }
-// `
+const labelStyles = css`
+  margin: 4px 0;
+`
 
 const Labels = styled.div`
   display: flex;

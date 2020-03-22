@@ -15,8 +15,8 @@ export const Stats = () => {
     : localStorage.getItem('allSites') || '[]'
 
   let stats = mode
-    ? localStorage.getItem('customStats') || '[]'
-    : localStorage.getItem('allStats') || '[]'
+    ? localStorage.getItem('customStats') || '{}'
+    : localStorage.getItem('allStats') || '{}'
 
   let count = 0
   return (

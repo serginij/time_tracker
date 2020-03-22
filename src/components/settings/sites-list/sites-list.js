@@ -71,6 +71,7 @@ export const SitesList = ({ disabled }) => {
         time={site.time}
         label={site.label.color ? site.label : { color: '#eeeeee', name: '' }}
         onUpdate={handleUpdateLabel}
+        disabled={disabled}
       />
       <CloseButton
         disabled={!checked || disabled}
@@ -100,7 +101,7 @@ export const SitesList = ({ disabled }) => {
         </Item> */}
         </List>
       </Wrapper>
-      <AddElement onAdd={handleAddSite} />
+      <AddElement onAdd={handleAddSite} disabled={disabled} />
     </>
   )
 }
