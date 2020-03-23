@@ -52,6 +52,7 @@ nav {
 .tag {
   height: 30px;
   box-sizing: border-box;
+  text-align: center;
   padding: 7px 12px;
   font-size: 14px;
   width: 80px;

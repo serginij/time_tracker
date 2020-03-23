@@ -7,8 +7,7 @@ import { SiteElement } from './site-element'
 import { AddElement } from './add-element'
 
 export const SitesList = ({ disabled }) => {
-  let [sites, setSites] = useState([])
-
+  const [sites, setSites] = useState([])
   const [checked, setChecked] = useState(false)
 
   const handleAddSite = (url, label) => {
@@ -34,6 +33,29 @@ export const SitesList = ({ disabled }) => {
     setSites(newSites)
   }
 
+  const handleSetTime = (e, url) => {
+    let error =
+      !e.target.checkValidity() ||
+      !(((e.target.value * 10) % 10).toString().length == 1)
+
+    let total = 0
+    let newSites = sites.map(site => {
+      if (site.url === url) {
+        site.goalErr = error
+        if (!error && total + e.target.value <= 24) {
+          site.goal = e.target.value
+        } else {
+          site.goalErr = true
+        }
+      } else if (site.goal) {
+        total += site.goal
+      }
+      return site
+    })
+    localStorage.setItem('customSites', JSON.stringify(newSites))
+    setSites(newSites)
+  }
+
   const handleDeleteSite = url => {
     let newSites = sites.filter(site => site.url !== url)
     localStorage.setItem('customSites', JSON.stringify(newSites))
@@ -55,7 +77,6 @@ export const SitesList = ({ disabled }) => {
   const handleCheck = e => {
     localStorage.setItem('useCustomSites', e.target.checked)
     setChecked(e.target.checked)
-    // onModeChange(e.target.checked)
   }
 
   useEffect(() => {
@@ -74,6 +95,19 @@ export const SitesList = ({ disabled }) => {
         onUpdate={handleUpdateLabel}
         disabled={disabled}
       />
+      <Goal>
+        <b>Цель, ч</b>
+        <input
+          type="number"
+          min="0"
+          max="24"
+          step="0.1"
+          defaultValue={site.goal}
+          placeholder="0"
+          onChange={e => handleSetTime(e, site.url)}
+        />
+        {site.goalErr && <p>Некорректный ввод</p>}
+      </Goal>
       <CloseButton
         disabled={!checked || disabled}
         onClick={() => handleDeleteSite(site.url)}
@@ -97,9 +131,6 @@ export const SitesList = ({ disabled }) => {
         </Header>
         <List checked={checked} data-testid="favorite-list">
           {list}
-          {/* <Item>
-          <AddElement disabled={!checked || disabled} onClick={handleAddSite} />
-        </Item> */}
         </List>
       </Wrapper>
       <AddElement onAdd={handleAddSite} disabled={disabled} />
@@ -147,4 +178,28 @@ const CloseButton = styled.button`
   color: black;
   margin-bottom: 4px
   visibility: ${props => (props.hidden ? 'hidden' : 'visible')};
+`
+
+const Goal = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  height: 50px;
+
+  p {
+    color: crimson;
+    font-size: 0.8em;
+    margin: 0;
+  }
+
+  b {
+    font-size: 0.8em;
+    margin: 0;
+  }
+
+  input {
+    width: 50px;
+    padding: 4px 8px;
+  }
 `
