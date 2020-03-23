@@ -26,7 +26,8 @@ export const SitesList = ({ disabled }) => {
         url: url,
         favicon: 'https://' + url + '/favicon.ico',
         time: 0,
-        label: label
+        label: label,
+        date: new Date().toLocaleDateString()
       })
     }
     localStorage.setItem('customSites', JSON.stringify(newSites))
