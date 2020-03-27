@@ -3,6 +3,10 @@ let settingsButton = document.querySelector('#settings')
 let resultsButton = document.querySelector('#results')
 let stopButton = document.querySelector('#stop')
 let timerLabel = document.querySelector('#timer')
+let goal = document.querySelector('#goal')
+let goalProgress = document.querySelector('#goal-progress')
+let goalValue = document.querySelector('#goal-value')
+let tag = document.querySelector('#tag')
 
 console.log('opened')
 // let current.stop = false
@@ -43,6 +47,7 @@ if (current.time) {
     current.stop = false
   }
 }
+
 let sec = time
 let min, hrs
 
@@ -66,6 +71,24 @@ if (isOn) {
     (min < 10 ? '0' + min : min) +
     ' : ' +
     (sec < 10 ? '0' + sec : sec)
+}
+
+if (current.goal) {
+  goalValue.innerHTML = `${current.goal} часов(а)`
+  goalProgress.max = current.goal
+  goalProgress.value = hrs + min / 60
+} else {
+  goal.style.display = 'none'
+  document.body.style.height = '180px'
+}
+
+if (current.label) {
+  tag.style.backgroundColor = current.label.color
+  tag.innerHTML = current.label.name
+} else {
+  timerLabel.style.width = '100%'
+  timerLabel.style.textAlign = 'center'
+  tag.style.display = 'none'
 }
 
 let interval

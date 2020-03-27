@@ -1,82 +1,83 @@
 import React from 'react'
 import { AddElement } from '../sites-list/add-element'
-import { SitesList, Header, Switch } from '../sites-list/sites-list'
-import { Settings, TurnOff } from '../index'
-import { render, cleanup, fireEvent } from '@testing-library/react'
+import { SitesList } from '../sites-list/sites-list'
+import { TurnOff } from './index'
+import { render, cleanup, fireEvent, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 
 afterEach(cleanup)
-const renderList = () => {
+
+const renderList = (disabled = false) => {
   const { getByTestId, queryAllByTestId, queryAllByRole } = render(
-    <SitesList disabled={false}>
-      <Header>
-        <Switch></Switch>
-      </Header>
-    </SitesList>
+    <SitesList disabled={disabled} />
   )
   return { getByTestId, queryAllByTestId, queryAllByRole }
 }
 const renderInput = () => {
-  const { queryAllByRole, getByText, getByRole } = render(<AddElement />)
-  return { queryAllByRole, getByText, getByRole }
-}
-const renderTurnOff = () => {
-  const { getByTestId } = render(
-    <Settings>
-      <TurnOff></TurnOff>
-    </Settings>
+  const { queryAllByRole, getByText, getByRole, getByTestId } = render(
+    <AddElement />
   )
-  return { getByTestId }
+  return { queryAllByRole, getByText, getByRole, getByTestId }
 }
 
 describe('off timer', () => {
-  test('off timer add list', () => {
-    const listUrl = [
-      'google.com',
-      'habr.com',
-      'vk.com',
-      'yandex.ru',
-      'asm.com',
-      'fd.com',
-      'ui.com'
-    ]
-    const { queryAllByTestId } = renderList()
-    const list = queryAllByTestId('favorite-list')[0]
-    const { getByTestId } = renderTurnOff()
+  test('button change text on click', () => {
+    render(<TurnOff onChange={() => {}} />)
+    expect(screen.getByRole('heading')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button'))
 
-    fireEvent.click(getByTestId('off-button'))
-    addSites(listUrl)
-
-    expect(list.children).toHaveLength(7)
+    expect(screen.getByRole('button')).toHaveTextContent('Включить таймер')
   })
 
-  test('off timer delete list', () => {
+  test('delete sites list element', () => {
     const { queryAllByTestId } = renderList()
     const list = queryAllByTestId('favorite-list')[0]
     checkbox()
-    deleteSites(queryAllByTestId, 1)
+    addSites()
+    fireEvent.click(queryAllByTestId('del-list')[0])
     expect(list.children).toHaveLength(6)
+  })
+  test('change target', () => {
+    const { queryAllByTestId } = renderList()
+    const goal = queryAllByTestId('goal')[0]
+
+    addSites()
+    fireEvent.change(goal, {
+      target: { value: 2 }
+    })
+    console.log(goal.value)
+    expect(goal.value).toHaveLength(1)
   })
 })
 
-const addSites = listUrl => {
+const addSites = (
+  listUrl = [
+    'google.com',
+    'habr.com',
+    'vk.com',
+    'yandex.ru',
+    'asm.com',
+    'fd.com',
+    'ui.com'
+  ]
+) => {
   const { queryAllByRole } = renderInput()
+
+  const add = render(<AddElement />).queryAllByTestId('button-add')[0]
+  const text = queryAllByRole('textbox')[0]
+  const label = queryAllByRole('button')[1]
 
   for (let i = 0; i < listUrl.length; i++) {
     // заполнение input
-    fireEvent.change(queryAllByRole('textbox')[0], {
+    fireEvent.change(text, {
       target: { value: listUrl[i] }
     })
-    //нажатие на label
-    fireEvent.click(queryAllByRole('button')[2])
-    // нажатие на кнопку Добавить
-    const btn = render(<AddElement />).queryAllByTestId('button-add')[0]
-    fireEvent.click(btn)
+
+    fireEvent.click(label)
+    fireEvent.click(add)
   }
 }
-const deleteSites = (queryAllByTestId, i) => {
-  fireEvent.click(queryAllByTestId('del-list')[i])
-}
+
 const checkbox = () => {
   const checkbox = renderList().queryAllByRole('checkbox')[0]
   fireEvent.click(checkbox)
