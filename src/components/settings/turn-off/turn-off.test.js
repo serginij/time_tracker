@@ -28,18 +28,18 @@ const renderTurnOff = () => {
 
 describe('off timer', () => {
   test('off timer add list', () => {
-    const listUrl = [
-      'google.com',
-      'habr.com',
-      'vk.com',
-      'yandex.ru',
-      'asm.com',
-      'fd.com',
-      'ui.com'
-    ]
+    // const listUrl = [
+    //   'google.com',
+    //   'habr.com',
+    //   'vk.com',
+    //   'yandex.ru',
+    //   'asm.com',
+    //   'fd.com',
+    //   'ui.com'
+    // ]
     const { getByTestId, getByText } = renderTurnOff()
-    const { queryAllByTestId } = renderList()
-    const list = queryAllByTestId('favorite-list')[0]
+    // const { queryAllByTestId } = renderList()
+    // const list = queryAllByTestId('favorite-list')[0]
 
     fireEvent.click(getByTestId('off-button'))
 
