@@ -105,6 +105,8 @@ export const SitesList = ({ disabled }) => {
           defaultValue={site.goal}
           placeholder="0"
           onChange={e => handleSetTime(e, site.url)}
+          disabled={disabled}
+          data-testid="goal"
         />
         {site.goalErr && <p>Некорректный ввод</p>}
       </Goal>

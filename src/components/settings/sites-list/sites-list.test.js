@@ -1,27 +1,23 @@
 import React from 'react'
 import { AddElement } from './add-element'
-import { SitesList, Header, Switch } from './sites-list'
+import { SitesList } from './sites-list'
 import { render, cleanup, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 
 afterEach(cleanup)
 // render
-export const renderList = () => {
+const renderList = () => {
   const { getByTestId, queryAllByTestId, queryAllByRole } = render(
-    <SitesList disabled={false}>
-      <Header>
-        <Switch></Switch>
-      </Header>
-    </SitesList>
+    <SitesList disabled={false}></SitesList>
   )
   return { getByTestId, queryAllByTestId, queryAllByRole }
 }
-export const renderInput = () => {
+const renderInput = () => {
   const { queryAllByRole, getByText, getByRole } = render(<AddElement />)
   return { queryAllByRole, getByText, getByRole }
 }
 describe('add to favorite sites', () => {
-  test('conteins 3 elements', () => {
+  test('conteins 5 elements', () => {
     const listUrl = ['google.com', 'habr.com', 'vk.com', 'yandex.ru', 'asm.com']
     const { getByTestId } = renderList()
     const list = getByTestId('favorite-list')
@@ -42,25 +38,28 @@ describe('add to favorite sites', () => {
   })
 })
 
-export const addSites = listUrl => {
+const addSites = listUrl => {
   const { queryAllByRole } = renderInput()
-
+  //---
+  const add = render(<AddElement />).queryAllByTestId('button-add')[0]
+  const text = queryAllByRole('textbox')[0]
+  const label = queryAllByRole('button')[1]
+  //---
   for (let i = 0; i < listUrl.length; i++) {
     // заполнение input
-    fireEvent.change(queryAllByRole('textbox')[0], {
+    fireEvent.change(text, {
       target: { value: listUrl[i] }
     })
     //нажатие на label
-    fireEvent.click(queryAllByRole('button')[2])
+    fireEvent.click(label)
     // нажатие на кнопку Добавить
-    const btn = render(<AddElement />).queryAllByTestId('button-add')[0]
-    fireEvent.click(btn)
+    fireEvent.click(add)
   }
 }
-export const deleteSites = (queryAllByTestId, i) => {
+const deleteSites = (queryAllByTestId, i) => {
   fireEvent.click(queryAllByTestId('del-list')[i]) || false
 }
-export const checkbox = () => {
+const checkbox = () => {
   const checkbox = renderList().queryAllByRole('checkbox')[0]
   fireEvent.click(checkbox)
 }
