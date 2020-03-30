@@ -42,13 +42,13 @@ export const SitesList = ({ disabled }) => {
     let newSites = sites.map(site => {
       if (site.url === url) {
         site.goalErr = error
-        if (!error && total + e.target.value <= 24) {
-          site.goal = e.target.value
+        if (!error && total + parseFloat(e.target.value) <= 24) {
+          site.goal = parseFloat(e.target.value)
         } else {
           site.goalErr = true
         }
       } else if (site.goal) {
-        total += site.goal
+        total += parseFloat(site.goal)
       }
       return site
     })
@@ -103,7 +103,7 @@ export const SitesList = ({ disabled }) => {
           max="24"
           step="0.1"
           defaultValue={site.goal}
-          placeholder="0"
+          placeholder="1.2"
           onChange={e => handleSetTime(e, site.url)}
           disabled={disabled}
           data-testid="goal"

@@ -64,7 +64,6 @@ export const Dropdown = ({
         visible={visible}
         onClick={() => {
           setVisible(false)
-          console.log('click backdrop')
         }}
       >
         <Body

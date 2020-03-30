@@ -10,11 +10,9 @@ let tag = document.querySelector('#tag')
 let sw = document.querySelector('#switch')
 let root = document.querySelector('#root')
 
-console.log('opened')
 let isOn = JSON.parse(localStorage.getItem('isOn'))
 
 settingsButton.addEventListener('click', () => {
-  console.log('open options page')
   if (chrome.runtime.openOptionsPage) {
     chrome.runtime.openOptionsPage()
   } else {
@@ -23,7 +21,6 @@ settingsButton.addEventListener('click', () => {
 })
 
 resultsButton.addEventListener('click', () => {
-  console.log('open options page')
   window.open(chrome.runtime.getURL('dist/index.html') + '?to=stats')
 })
 
@@ -31,7 +28,6 @@ let current = JSON.parse(localStorage.getItem('current'))
 let time = parseInt(localStorage.getItem('time'))
 
 if (current.time) {
-  console.log(current.stop)
   if (current.stop) {
     time = current.time
     stopButton.innerHTML = 'Start'
@@ -93,7 +89,6 @@ let interval
 
 let timer = () =>
   (interval = setInterval(() => {
-    console.log(sec)
     sec++
     time++
     if (sec == 60) {
@@ -130,10 +125,6 @@ stopButton.addEventListener('click', () => {
       stopButton.innerHTML = 'Start'
     }
   }
-
-  chrome.runtime.getBackgroundPage(backgroundPage => {
-    console.log('got background', backgroundPage)
-  })
 })
 
 sw.addEventListener('change', e => {
