@@ -7,10 +7,11 @@ let goal = document.querySelector('#goal')
 let goalProgress = document.querySelector('#goal-progress')
 let goalValue = document.querySelector('#goal-value')
 let tag = document.querySelector('#tag')
+let sw = document.querySelector('#switch')
+let root = document.querySelector('#root')
 
 console.log('opened')
-// let current.stop = false
-const isOn = JSON.parse(localStorage.getItem('isOn'))
+let isOn = JSON.parse(localStorage.getItem('isOn'))
 
 settingsButton.addEventListener('click', () => {
   console.log('open options page')
@@ -23,26 +24,19 @@ settingsButton.addEventListener('click', () => {
 
 resultsButton.addEventListener('click', () => {
   console.log('open options page')
-  // if (chrome.runtime.openOptionsPage) {
-  //   chrome.runtime.openOptionsPage()
-  // } else {
   window.open(chrome.runtime.getURL('dist/index.html') + '?to=stats')
-  // }
 })
 
 let current = JSON.parse(localStorage.getItem('current'))
 let time = parseInt(localStorage.getItem('time'))
 
 if (current.time) {
-  // current.stop = current.stop
   console.log(current.stop)
   if (current.stop) {
-    // sec = current.time
     time = current.time
     stopButton.innerHTML = 'Start'
   } else {
     time += current.time
-    // sec += current.time
     stopButton.innerHTML = 'Stop'
     current.stop = false
   }
@@ -64,13 +58,17 @@ if (min > 60) {
 } else {
   hrs = (min - (min % 60)) / 60
 }
+timerLabel.innerHTML =
+  (hrs ? (hrs < 10 ? '0' + hrs : hrs) + ' : ' : '') +
+  (min < 10 ? '0' + min : min) +
+  ' : ' +
+  (sec < 10 ? '0' + sec : sec)
 
 if (isOn) {
-  timerLabel.innerHTML =
-    (hrs ? (hrs < 10 ? '0' + hrs : hrs) + ' : ' : '') +
-    (min < 10 ? '0' + min : min) +
-    ' : ' +
-    (sec < 10 ? '0' + sec : sec)
+  sw.checked = true
+} else {
+  root.style.opacity = 0.5
+  stopButton.disabled = true
 }
 
 if (current.goal) {
@@ -112,7 +110,6 @@ let timer = () =>
       (min < 10 ? '0' + min : min) +
       ' : ' +
       (sec < 10 ? '0' + sec : sec)
-    // localStorage.setItem('time', sec + '')
   }, 1000))
 clearInterval(interval)
 !current.stop && timer()
@@ -124,14 +121,12 @@ stopButton.addEventListener('click', () => {
       localStorage.setItem('time', 0)
       localStorage.setItem('current', JSON.stringify(current))
       timer()
-      // current.stop = false
       stopButton.innerHTML = 'Stop'
     } else {
       clearInterval(interval)
       current.time = time
       current.stop = true
       localStorage.setItem('current', JSON.stringify(current))
-      // current.stop = true
       stopButton.innerHTML = 'Start'
     }
   }
@@ -139,6 +134,26 @@ stopButton.addEventListener('click', () => {
   chrome.runtime.getBackgroundPage(backgroundPage => {
     console.log('got background', backgroundPage)
   })
+})
+
+sw.addEventListener('change', e => {
+  localStorage.setItem('isOn', e.target.checked)
+  if (isOn) {
+    clearInterval(interval)
+    current.time = time
+    current.stop = true
+    localStorage.setItem('current', JSON.stringify(current))
+    stopButton.disabled = true
+    root.style.opacity = 0.5
+  } else {
+    current.stop = false
+    localStorage.setItem('time', 0)
+    localStorage.setItem('current', JSON.stringify(current))
+    timer()
+    stopButton.disabled = false
+    root.style.opacity = 1
+  }
+  isOn = e.target.checked
 })
 
 if (current.stop || !isOn) {

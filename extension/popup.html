@@ -7,13 +7,16 @@
   </head>
   <body>
     <header>
-      <img src="switch.svg" alt='turn off'>
+      <label class="switch">
+        <input type="checkbox" id='switch'>
+        <span class="slider round"></span>
+      </label>
       <nav>
         <p class='link' id='results'>Результаты</p>
         <p class='link' id='settings'>Настройки</p>
       </nav>
     </header>
-    <div class="root">
+    <div class="root" id='root'>
       <div id='goal'>
         <p class="goal-title">текущая цель:</p>
         <p class="goal" id='goal-value'>20 часов(а)</p>
